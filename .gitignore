@@ -2,3 +2,4 @@ temp
 dist
 app/styles/compass*
 app/styles/_compass*
+app/components/*
