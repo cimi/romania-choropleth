@@ -8,6 +8,9 @@ require.config({
     },
     topojson: {
       exports: 'topojson'
+    },
+    handlebars: {
+      exports: 'Handlebars'
     }
   },
 
@@ -15,11 +18,12 @@ require.config({
     d3: '../components/d3/d3',
     queue: '../components/queue/index',
     topojson: '../components/topojson/index',
+    handlebars: '../components/handlebars/handlebars-1.0.0-rc.1',
     jquery: 'vendor/jquery.min'
   }
 });
  
-require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
+require(['d3', 'queue', 'topojson', 'handlebars'], function(d3, queue, topojson, Handlebars) {
   "use strict"
   var width = 960
     , height = 600
@@ -48,6 +52,9 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
     .domain([-200000, 200000])
     .range(["brown", "steelblue"]);
 
+
+  var template = Handlebars.compile($('#infoboxTemplate').html());
+
   function ready(error, topology, population) {
     map = d3.select('#map').append('svg')
         .style('width', width)
@@ -66,6 +73,8 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
 
     var hilight = function (element, datum, population) {
       d3.select(element).transition().duration(500).style('fill-opacity', 1);
+      console.log(datum)
+      $('#infobox').html(template(datum));
     };
 
     var unhilight = function (element, datum, population) {

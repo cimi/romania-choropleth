@@ -4,6 +4,7 @@
   "dependencies": {
     "d3": "~3.0.2",
     "queue": "https://raw.github.com/mbostock/queue/master/queue.js",
-    "topojson": "https://raw.github.com/mbostock/topojson/master/topojson.js"
+    "topojson": "https://raw.github.com/mbostock/topojson/master/topojson.js",
+    "handlebars": "~1.0.0-rc.1"
   }
 }
