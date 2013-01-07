@@ -25,7 +25,7 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
     , map;
 
   var q = queue()
-      .defer(d3.json, "/data/romania-counties-geojson.json")
+      .defer(d3.json, "/data/romania-counties-topojson.json")
       .await(ready);
 
 //create geo.path object, set the projection to mercator bring it to the svg-viewport
@@ -43,15 +43,15 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
   var path = d3.geo.path().projection(albers);
   var projection = albers;
 
-  function ready(error, countylines) {
+  function ready(error, topology) {
     map = d3.select('#map').append('svg')
         .style('width', width)
         .style('height', height);
-  
+    topology = topology[0];
     var counties = map.append('g')
         .attr('class', 'counties')
         .selectAll('path')
-        .data(countylines[0].features)
+        .data(topojson.object(topology, topology.objects.counties).geometries)
         .enter().append('path')
         .attr('d', path);
   };
