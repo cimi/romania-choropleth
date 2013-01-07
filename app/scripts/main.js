@@ -20,11 +20,12 @@ require.config({
 });
  
 require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
+  "use strict"
   var width = 960
     , height = 600
     , map;
 
-  var q = queue(1)
+  var q = queue()
       .defer(d3.json, "/data/romania-counties-topojson.json")
       .defer(d3.tsv, "/data/romania-counties-population.tsv")
       .await(ready);
@@ -52,15 +53,23 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
         .style('width', width)
         .style('height', height);
     var data = topojson.object(topology, topology.objects['romania-counties-geojson']);
-    console.log(data);
+    
     var counties = map.append('g')
         .attr('class', 'counties')
         .selectAll('path')
         .data(data.geometries)
         .enter().append('path')
         .attr('d', path)
-        .style("fill", function (d) { 
-          return fill(d.properties.POP2004 - d.properties.POP1956); 
-        });
+        .style("fill", function (d) { return fill(d.properties.POP2004 - d.properties.POP1956); })
+        .on("mouseover", function (d, i) { hilight(this, d); })
+        .on("mouseout", function (d, i) { unhilight(this, d); });
+
+    var hilight = function (element, datum, population) {
+      d3.select(element).transition().duration(500).style('fill-opacity', 1);
+    };
+
+    var unhilight = function (element, datum, population) {
+      d3.select(element).transition().duration(500).style('fill-opacity', 0.8);
+    };
   };
 });
