@@ -13,7 +13,7 @@ require.config({
 
   paths: {
     d3: '../components/d3/d3',
-    queue: '../components/queue/queue',
+    queue: '../components/queue/index',
     topojson: '../components/topojson/index',
     jquery: 'vendor/jquery.min'
   }
@@ -24,8 +24,9 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
     , height = 600
     , map;
 
-  var q = queue()
+  var q = queue(1)
       .defer(d3.json, "/data/romania-counties-topojson.json")
+      .defer(d3.tsv, "/data/romania-counties-population.tsv")
       .await(ready);
 
   var mercator = d3.geo.mercator()
@@ -46,15 +47,16 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
     .domain([2000, 10000])
     .range(["brown", "steelblue"]);
 
-  function ready(error, topology) {
+  function ready(error, topology, population) {
     map = d3.select('#map').append('svg')
         .style('width', width)
         .style('height', height);
-    topology = topology[0];
+    var data = topojson.object(topology, topology.objects['romania-counties-geojson']);
+
     var counties = map.append('g')
         .attr('class', 'counties')
         .selectAll('path')
-        .data(topojson.object(topology, topology.objects.counties).geometries)
+        .data(data.geometries)
         .enter().append('path')
         .attr('d', path)
         .style("fill", function (d) { return fill(path.area(d)); });
