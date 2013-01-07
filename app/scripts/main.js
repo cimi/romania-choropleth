@@ -43,8 +43,8 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
   var path = d3.geo.path().projection(albers);
   var projection = albers;
 
-  var fill = d3.scale.log()
-    .domain([2000, 10000])
+  var fill = d3.scale.linear()
+    .domain([-200000, 200000])
     .range(["brown", "steelblue"]);
 
   function ready(error, topology, population) {
@@ -52,13 +52,15 @@ require(['d3', 'queue', 'topojson'], function(d3, queue, topojson) {
         .style('width', width)
         .style('height', height);
     var data = topojson.object(topology, topology.objects['romania-counties-geojson']);
-
+    console.log(data);
     var counties = map.append('g')
         .attr('class', 'counties')
         .selectAll('path')
         .data(data.geometries)
         .enter().append('path')
         .attr('d', path)
-        .style("fill", function (d) { return fill(path.area(d)); });
+        .style("fill", function (d) { 
+          return fill(d.properties.POP2004 - d.properties.POP1956); 
+        });
   };
 });
