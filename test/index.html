@@ -23,22 +23,18 @@
   <!-- -->
 
   <!-- include source files here... -->
+  <script data-main="scripts/main" src="scripts/vendor/require.js"></script>
 
-  <!-- include spec files here... -->
+
   <script>
-  // replace this by your own specs
-  (function() {
-    describe('Give it some context', function() {
-      describe('maybe a bit more context here', function() {
-
-        it('should run here few assertions', function() {
-
-        });
-
-      });
+    mocha.setup({ui: 'bdd', ignoreLeaks: true});
+    expect = chai.expect;
+    require(['../spec/romania.spec'], function () {
+      setTimeout(function () {
+        require(['../runner/mocha']);
+      }, 100);
     });
-  })();
-  </script>
+  </script> 
 
   <!-- trigger the mocha runner -->
   <script src="runner/mocha.js"></script>
