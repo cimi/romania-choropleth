@@ -5,8 +5,7 @@ require(['romania'], function (Romania) {
       title: 'test configuration',
       datafile: '/data/romania-counties-population.tsv',
       domain: [100, 1000],
-      formula: 'data[0] - data[1]',
-      callback: function () {}
+      formula: 'data[0] - data[1]'
     };
 
     describe('Configure the map', function () {
@@ -30,6 +29,14 @@ require(['romania'], function (Romania) {
     });
 
     describe('Render the map and colorize it', function () {
+      beforeEach(function () {
+        $('#map').empty();
+      });
+
+      afterEach(function () {
+        validConfig.callback = undefined;
+      });
+
       it('should read the specified datafile and make the data available', function () {
         
         validConfig.callback = function (map) {

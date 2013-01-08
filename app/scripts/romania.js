@@ -17,7 +17,12 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
     'default' : 'albers'
   };
 
-  var scales = {};  
+  var scales = {};
+
+  var fill = d3.scale.linear()
+    .domain([-200000, 200000])
+    .range(["brown", "steelblue"]);
+  var path = d3.geo.path().projection(projections.albers);
 
   var Romania = function (config) {
     var mandatory = ['title', 'datafile', 'formula', 'domain'];
@@ -36,6 +41,17 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
 
   var dataLoaded = function (error, topology, data) {
     this.data = data;
+
+    var map = d3.select('#map').append('svg')
+        .style('width', width)
+        .style('height', height);
+    var geojson = topojson.object(topology, topology.objects['romania-counties-geojson']);
+    var counties = map.append('g')
+        .attr('class', 'counties')
+        .selectAll('path').data(geojson.geometries)
+        .enter().append('path').attr('d', path)
+        .style("fill", function (d) { return fill(d.properties.POP2004 - d.properties.POP1956); })
+
     if (this.config.callback) {
       this.config.callback(this); 
     }
