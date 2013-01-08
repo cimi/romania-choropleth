@@ -7,37 +7,24 @@
 </head>
 <body>
   <div id="mocha"></div>
+  <div id="map"></div>
   <script src="lib/mocha/mocha.js"></script>
-  <script>mocha.setup('bdd')</script>
-
   <!-- assertion framework -->
-  
   <script src="lib/chai.js"></script>
-    
-      
-  <script>expect = chai.expect</script>
-      
-    
-  
-
-  <!-- -->
 
   <!-- include source files here... -->
   <script data-main="scripts/main" src="scripts/vendor/require.js"></script>
 
-
   <script>
     mocha.setup({ui: 'bdd', ignoreLeaks: true});
     expect = chai.expect;
+    should = chai.should();
     require(['../spec/romania.spec'], function () {
       setTimeout(function () {
         require(['../runner/mocha']);
       }, 100);
     });
   </script> 
-
-  <!-- trigger the mocha runner -->
-  <script src="runner/mocha.js"></script>
 
 </body>
 </html>

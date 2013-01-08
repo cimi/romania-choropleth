@@ -81,24 +81,22 @@ module.exports = function( grunt ) {
         'Gruntfile.js',
         'app/scripts/*.js',
         'spec/**/*.js'
-      ]
-    },
-
-    // specifying JSHint options and globals
-    // https://github.com/cowboy/grunt/blob/master/docs/task_lint.md#specifying-jshint-options-and-globals
-    jshint: {
+      ],
       options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        boss: true,
-        eqnull: true,
-        browser: true
+        options: {
+          curly: true,
+          eqeqeq: true,
+          immed: true,
+          latedef: true,
+          newcap: true,
+          noarg: true,
+          sub: true,
+          undef: true,
+          boss: true,
+          eqnull: true,
+          browser: true,
+          laxcomma: true
+        }
       },
       globals: {
         jQuery: true
