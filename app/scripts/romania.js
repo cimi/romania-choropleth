@@ -13,16 +13,47 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
       .center([24.7731, 45.7909])
       .rotate([-10.4, 2.6, -9.6])
       .parallels([43, 49])
-      .scale(7000),
-    'default' : 'albers'
+      .scale(7000)
   };
 
-  var scales = {};
 
-  var fill = d3.scale.linear()
-    .domain([-200000, 200000])
-    .range(["brown", "steelblue"]);
-  var path = d3.geo.path().projection(projections.albers);
+  var setDefaults = function (config) {
+    if (!config.target) {
+      config.target = '#map';
+    }
+
+    // set the correct scale from d3 if available, if not default to linear
+    if (!d3.scale[config.scale]) {
+      config.scale = d3.scale.linear;
+    } else {
+      config.scale = d3.scale[config.scale];
+    }
+
+    if (!projections[config.projection]) {
+      config.projection = projections.albers;
+    } else {
+      config.projection = projections[config.projection];
+    }
+
+    if (!config.range || !config.range instanceof Array) {
+      config.range = ['brown', 'steelblue'];
+    }
+
+    return config;
+  }
+
+  var createFormulaFunction = function (formula) {
+    var func = new Function('data', 'return ' + formula);
+    return func;
+  }
+
+  var processData = function (data) {
+    var result = {};
+    data.forEach(function (val) {
+      result[val.id] = val;
+    });
+    return result;
+  }
 
   var Romania = function (config) {
     var mandatory = ['title', 'datafile', 'formula', 'domain'];
@@ -31,7 +62,15 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
       if (!config[param]) throw new Error (param + ' is not present in the configuration');
     });
     
-    this.config = config;
+    this.config = setDefaults(config);
+    this.config.formula = createFormulaFunction(config.formula);
+
+    // set the fill function depending on the configuration
+    this.fill = this.config.scale()
+        .domain(this.config.domain)
+        .range(this.config.range);
+
+    this.path = d3.geo.path().projection(this.config.projection);
 
     var q = queue()
       .defer(d3.json, "/data/romania-counties-topojson.json")
@@ -40,17 +79,21 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
   };
 
   var dataLoaded = function (error, topology, data) {
-    this.data = data;
+    this.data = processData(data);
 
-    var map = d3.select('#map').append('svg')
+    var mapEl = d3.select(this.config.target).append('svg')
         .style('width', width)
         .style('height', height);
+
     var geojson = topojson.object(topology, topology.objects['romania-counties-geojson']);
-    var counties = map.append('g')
+    var counties = mapEl.append('g')
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
-        .enter().append('path').attr('d', path)
-        .style("fill", function (d) { return fill(d.properties.POP2004 - d.properties.POP1956); })
+        .enter().append('path').attr('d', this.path)
+        .style("fill", $.proxy(function (d) { 
+          return 100;
+          // return this.fill(this.config.formula(this.data[d.id])); 
+        }, this));
 
     if (this.config.callback) {
       this.config.callback(this); 
