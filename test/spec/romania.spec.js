@@ -6,8 +6,8 @@ require(['romania'], function (Romania) {
       validConfig = {
         title: 'test configuration',
         datafile: '/data/romania-counties-population.tsv',
-        domain: [100, 1000],
-        formula: 'data[0] - data[1]',
+        domain: [-500000, 500000],
+        formula: 'data.pop2004 - data.pop1956',
         target: '#myMap'
       };
       $target = $(validConfig.target);
@@ -24,9 +24,11 @@ require(['romania'], function (Romania) {
         map = new Romania(validConfig);
       });
 
-      it('should keep and return the initial configuration after instantiation', function () {
+      it('should return a fully populated configuration after instantiation', function () {
         expect(map.getConfig()).to.equal(validConfig);
       });
+
+      it('should not alter the config object passed as a parameter');
 
       it('should enforce mandatory parameters in the configuration', function () {
         var config = {
@@ -39,10 +41,15 @@ require(['romania'], function (Romania) {
         }).should.throw(Error);
       });
 
-      it('should generate a function from the formula', function () {        
-        var formulaFunc = map.getConfig().formula;
-        expect(formulaFunc).to.be.an.instanceOf(Function);
-        expect(formulaFunc([0, 1, 2, 3, 4])).to.equal(-1);
+      it('should generate a function from the formula', function (done) {
+        validConfig.callback = function (map) {        
+          var formulaFunc = map.getConfig().formula;
+          expect(formulaFunc).to.be.an.instanceOf(Function);
+          expect(formulaFunc({id: 'BV', pop2004: '596140', pop1956: '373941'})).to.equal(222199);
+          done();
+        }
+        validConfig.formula = 'data.pop2004 - data.pop1956';
+        var map = new Romania(validConfig);
       });
 
       it('should set the correct scale for the map coloring', function () {
@@ -93,14 +100,14 @@ require(['romania'], function (Romania) {
       it('should colorize the map according to the data', function (done) {
         validConfig.callback = function (map) {
 
-          // console.log(map.getConfig().formula);
-          // var bv = d3.selectAll('path').filter(function (d, i) {
-          //   return d.id == 'Brasov';
-          // });
-          // console.log(bv.style('fill'));
+          var bv = d3.selectAll('path').filter(function (d, i) {
+            return d.id == 'Brasov';
+          });
+          expect(bv.style('fill')).to.equal('#4863A0');
+
           done();
         };
-        
+        validConfig.domain = [-200 * 1000, 200 * 1000];
         var map = new Romania(validConfig);
       });
     });
