@@ -128,5 +128,11 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
     return this.data;
   };
 
+  Romania.prototype.getCountyElement = function (id) {
+    return d3.selectAll('path').filter(function (d, i) {
+      return d.id == id;
+    });
+  }
+
   return Romania;
 });

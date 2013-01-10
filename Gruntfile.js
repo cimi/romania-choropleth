@@ -101,10 +101,7 @@ module.exports = function( grunt ) {
         }
       },
       globals: {
-        jQuery: true,
-        define: false,
-        require: false,
-        node: true
+        jQuery: true
       }
     },
 

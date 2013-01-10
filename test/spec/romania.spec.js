@@ -105,9 +105,7 @@ require(['romania', 'jquery'], function (Romania, $) {
           var data = map.getData();
           expect(Object.keys(data)).to.have.length(2);
           checkData(data);
-          var ct = d3.selectAll('path').filter(function (d, i) {
-            return d.id == 'CT';
-          });
+          var ct = map.getCountyElement('CT');
           expect(ct.style('fill')).to.equal(validConfig.defaultFill);
           done();
         };
@@ -128,13 +126,20 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
 
+      it('should allow you to select a county element based on its ID', function (done) {
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV');
+          expect(bv).to.exist;
+          expect(bv.datum().properties.name).to.equal('Brașov');
+          done();
+        }
+        var map = new Romania(validConfig);
+      });
+
       it('should color the map according to the data', function (done) {
         validConfig.callback = function (map) {
-          var bv = d3.selectAll('path').filter(function (d, i) {
-            return d.id == 'BV';
-          });
+          var bv = map.getCountyElement('BV');
           expect(bv.style('fill')).to.equal(validConfig.range[1]);
-
           done();
         };
         // setting the exact difference so we can test the upper bound
@@ -144,5 +149,24 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
     });
+
+
+    describe('Create an infobox displaying requested data on mouseover', function () {
+      it('should show a box with relevant information when hovering over a county and hide it when the cursor leaves it', function (done) {
+        validConfig.infobox = '#myInfobox';
+        validConfig.callback = function (map) {
+          expect($('#myInfobox').is(':visible')).to.be.false;
+          var bv = map.getCountyElement('BV');
+          $(bv[0][0]).mouseenter();
+          expect($('#myInfobox').is(':visible')).to.be.true;
+          $(bv[0][0]).mouseleave();
+          expect($('#myInfobox').is(':visible')).to.be.false;
+          done();
+        }
+        var map = new Romania(validConfig);
+      });
+      it('should hide the box when the cursor leaves the county');
+      it('should have a template for data that gets rendered using the county\'s data');
+    })
   });
 });
