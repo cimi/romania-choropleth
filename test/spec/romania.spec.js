@@ -1,4 +1,5 @@
-require(['romania'], function (Romania) {
+require(['romania', 'jquery'], function (Romania, $) {
+  "use strict";
   describe('Choropleth Map Generator For Romania', function() {
     
     var validConfig, $target, map;
@@ -75,23 +76,49 @@ require(['romania'], function (Romania) {
       });
     });
 
-    describe('Render the map and colorize it', function () {
+    describe('Read the data and make it available', function () {
+      var checkData = function (data) {
+        expect(data['BV'].name).to.equal('Brasov');
+        expect(data['B'].name).to.equal('Municipiul Bucuresti');        
+      };
 
-      it('should read the specified datafile and make the data available by id', function (done) {
-        
+      it('should throw an error if the file extension is not supported', function () {
+        validConfig.datafile = 'data/chec.xls';
+        (function () {
+          new Romania(config);
+        }).should.throw(Error);
+      })
+
+      it('should support tsv', function (done) {  
         validConfig.callback = function (map) {
           var data = map.getData();
           expect(Object.keys(data)).to.have.length(42);
-          expect(data['BV'].name).to.equal('Brasov');
-          expect(data['B'].name).to.equal('Municipiul Bucuresti');
+          checkData(data);
           done();
         };
 
         var map = new Romania(validConfig);
       });
 
+      it('should support csv and should support datafiles without all counties specified', function (done) {
+        validConfig.callback = function (map) {
+          var data = map.getData();
+          expect(Object.keys(data)).to.have.length(2);
+          checkData(data);
+          var ct = d3.selectAll('path').filter(function (d, i) {
+            return d.id == 'CT';
+          });
+          expect(ct.style('fill')).to.equal(validConfig.defaultFill);
+          done();
+        };
+        validConfig.datafile = 'data/fixture.csv';
+        validConfig.defaultFill = '#bada55';
+        var map = new Romania(validConfig);
+      });
+    });
+
+    describe('Render the map and color it', function () {
       it('should draw the map and render it on the screen', function (done) {
-        
         validConfig.callback = function () {
           expect($target.children()).to.have.length(1);
           expect($target.find('path')).to.have.length(42);
@@ -101,12 +128,12 @@ require(['romania'], function (Romania) {
         var map = new Romania(validConfig);
       });
 
-      it('should colorize the map according to the data', function (done) {
+      it('should color the map according to the data', function (done) {
         validConfig.callback = function (map) {
           var bv = d3.selectAll('path').filter(function (d, i) {
             return d.id == 'BV';
           });
-          expect(bv.style('fill')).to.equal('#800080');
+          expect(bv.style('fill')).to.equal(validConfig.range[1]);
 
           done();
         };

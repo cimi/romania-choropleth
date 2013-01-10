@@ -18,28 +18,36 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
 
 
   var createConfig = function (config) {
-    var result = {};
-    $.extend(result, config);
-    console.log(result);
-    if (!config.target) {
-      result.target = '#map';
-    }
+    var result = $.extend({}, config)
+      , checks = {
+        scale: d3.scale[config.scale],
+        projection: projections[config.projection],
+        range: config.range,
+        defaultFill: config.defaultFill,
+        target: config.target
+      }, defaults = {
+        scale: d3.scale.linear,
+        projection: projections.albers,
+        range: ['brown', 'steelblue'],
+        defaultFill: 'white',
+        target: '#map'
+      };
+    
+    // put in defaults
+    $.each(checks, function (key, value) {
+      if (value) {
+        result[key] = value;
+      } else {
+        result[key] = defaults[key];
+      }
+    });
 
-    // set the correct scale from d3 if available, if not default to linear
-    if (!d3.scale[config.scale]) {
-      result.scale = d3.scale.linear;
-    } else {
-      result.scale = d3.scale[config.scale];
-    }
+    // remember the datafile type
+    result.datafileType = /\.([^.]+)$/.exec(config.datafile)[1];
 
-    if (!projections[config.projection]) {
-      result.projection = projections.albers;
-    } else {
-      result.projection = projections[config.projection];
-    }
-
-    if (!config.range || !config.range instanceof Array) {
-      result.range = ['brown', 'steelblue'];
+    if (['csv','tsv'].indexOf(result.datafileType) === -1) {
+      throw new Error("Unsupported datafile type: " + result.datafileType + "." +
+        "Only csv and tsv are supported at the moment. Please use the appropriate extension.");
     }
 
     return result;
@@ -74,15 +82,14 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
 
     this.path = d3.geo.path().projection(this.config.projection);
 
-    var q = queue()
+    queue()
       .defer(d3.json, "/data/romania-counties-topojson.json")
-      .defer(d3.tsv, config.datafile)
+      .defer(d3[this.config.datafileType], config.datafile)
       .await($.proxy(dataLoaded, this));
   };
 
   var dataLoaded = function (error, topology, data) {
     this.data = processData(data);
-
     var mapEl = d3.select(this.config.target).append('svg')
         .style('width', width)
         .style('height', height);
@@ -93,7 +100,12 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
         .style("fill", $.proxy(function (d) {
-          return this.fill(this.config.formula(this.data[d.id])); 
+          var countyData = this.data[d.id];
+          if (countyData) {
+            return this.fill(this.config.formula(this.data[d.id]));   
+          } else {
+            return this.config.defaultFill;
+          }
         }, this));
 
     if (this.config.callback) {
