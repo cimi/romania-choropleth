@@ -17,29 +17,32 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
   };
 
 
-  var setDefaults = function (config) {
+  var createConfig = function (config) {
+    var result = {};
+    $.extend(result, config);
+    console.log(result);
     if (!config.target) {
-      config.target = '#map';
+      result.target = '#map';
     }
 
     // set the correct scale from d3 if available, if not default to linear
     if (!d3.scale[config.scale]) {
-      config.scale = d3.scale.linear;
+      result.scale = d3.scale.linear;
     } else {
-      config.scale = d3.scale[config.scale];
+      result.scale = d3.scale[config.scale];
     }
 
     if (!projections[config.projection]) {
-      config.projection = projections.albers;
+      result.projection = projections.albers;
     } else {
-      config.projection = projections[config.projection];
+      result.projection = projections[config.projection];
     }
 
     if (!config.range || !config.range instanceof Array) {
-      config.range = ['brown', 'steelblue'];
+      result.range = ['brown', 'steelblue'];
     }
 
-    return config;
+    return result;
   }
 
   var createFormulaFunction = function (formula) {
@@ -56,13 +59,12 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
   }
 
   var Romania = function (config) {
-    var mandatory = ['title', 'datafile', 'formula', 'domain'];
-    
-    mandatory.forEach(function (param) {
+    // enforce mandatory fields    
+    ['title', 'datafile', 'formula', 'domain'].forEach(function (param) {
       if (!config[param]) throw new Error (param + ' is not present in the configuration');
     });
     
-    this.config = setDefaults(config);
+    this.config = createConfig(config);
     this.config.formula = createFormulaFunction(config.formula);
 
     // set the fill function depending on the configuration
@@ -91,9 +93,7 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
         .style("fill", $.proxy(function (d) {
-          console.log(this.data[d.id], d.id);
           return this.fill(this.config.formula(this.data[d.id])); 
-          // return this.fill(200000);
         }, this));
 
     if (this.config.callback) {

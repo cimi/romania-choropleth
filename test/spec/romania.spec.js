@@ -24,11 +24,13 @@ require(['romania'], function (Romania) {
         map = new Romania(validConfig);
       });
 
-      it('should return a fully populated configuration after instantiation', function () {
-        expect(map.getConfig()).to.equal(validConfig);
+      it('should return a fully populated configuration after instantiation without altering the original object', function () {
+        var config = map.getConfig();
+        expect(config).to.not.equal(validConfig);
+        ['title', 'datafile', 'domain'].forEach(function (field) {
+          expect(config[field]).to.equal(validConfig[field]);
+        });
       });
-
-      it('should not alter the config object passed as a parameter');
 
       it('should enforce mandatory parameters in the configuration', function () {
         var config = {
@@ -58,6 +60,7 @@ require(['romania'], function (Romania) {
 
         validConfig.scale = 'log';
         map = new Romania(validConfig);
+        config = map.getConfig();
         expect(config.scale, 'different scale').to.equal(d3.scale.log);
       });
 
@@ -67,6 +70,7 @@ require(['romania'], function (Romania) {
 
         validConfig.range = ['orange', 'purple'];
         map = new Romania(validConfig);
+        config = map.getConfig();
         expect(config.range, 'custom color range').to.deep.equal(['orange', 'purple']);
       });
     });
@@ -99,7 +103,6 @@ require(['romania'], function (Romania) {
 
       it('should colorize the map according to the data', function (done) {
         validConfig.callback = function (map) {
-          console.log(map.getConfig())
           var bv = d3.selectAll('path').filter(function (d, i) {
             return d.id == 'BV';
           });
