@@ -90,11 +90,10 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
-        .style("fill", $.proxy(function (d) { 
-          // return this.fill(this.config.formula(this.data[d.id])); 
-          console.log(d.id);
-          console.log(this.data[d.id]);
-          return 200000;
+        .style("fill", $.proxy(function (d) {
+          console.log(this.data[d.id], d.id);
+          return this.fill(this.config.formula(this.data[d.id])); 
+          // return this.fill(200000);
         }, this));
 
     if (this.config.callback) {

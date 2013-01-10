@@ -99,15 +99,18 @@ require(['romania'], function (Romania) {
 
       it('should colorize the map according to the data', function (done) {
         validConfig.callback = function (map) {
-
+          console.log(map.getConfig())
           var bv = d3.selectAll('path').filter(function (d, i) {
-            return d.id == 'Brasov';
+            return d.id == 'BV';
           });
-          expect(bv.style('fill')).to.equal('#4863A0');
+          expect(bv.style('fill')).to.equal('#800080');
 
           done();
         };
-        validConfig.domain = [-200 * 1000, 200 * 1000];
+        // setting the exact difference so we can test the upper bound
+        validConfig.domain = [-200 * 1000, 222199];
+        validConfig.range = ['red', '#800080'];
+        validConfig.scale = 'linear';
         var map = new Romania(validConfig);
       });
     });
