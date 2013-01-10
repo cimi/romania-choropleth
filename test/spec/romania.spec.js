@@ -158,8 +158,28 @@ require(['romania', 'jquery'], function (Romania, $) {
 
 
     describe('Create an infobox displaying requested data on mouseover', function () {
+      it('should throw errors if the infobox or the template selectors are invalid', function () {
+        validConfig.infoBox = '#myInfoBox';
+        // missing template
+        (function () {
+          var map = new Romania(validConfig); 
+        }).should.throw(Error);
+
+        validConfig.infoBox = '#missingElement';
+        (function () {
+          var map = new Romania(validConfig); 
+        }).should.throw(Error);
+
+        validConfig.infoBox = '#myInfobox';
+        validConfig.infoBoxTemplate = '#wrongTemplate';
+        (function () {
+          var map = new Romania(validConfig); 
+        }).should.throw(Error);
+      });
+
       it('should show a box with relevant information when hovering over a county and hide it when the cursor leaves it', function (done) {
         validConfig.infoBox = '#myInfobox';
+        validConfig.infoBoxTemplate = '#infoboxTemplate';
         validConfig.callback = function (map) {
           expect($('#myInfobox').is(':visible'), 'initially hidden').to.be.false;
           var bv = map.getCountyElement('BV');
@@ -172,16 +192,21 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
 
-      it('should have a template for data that gets rendered using the county\'s data', function () {
+      it('should have a template for data that gets rendered using the county\'s data', function (done) {
         validConfig.infoBox = '#myInfobox';
+        validConfig.infoBoxTemplate = '#infoboxTemplate';
+
         validConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
           bv.node().dispatchEvent(createEvent('mouseover'));
           
           var $box = $(validConfig.infoBox);
           expect($box.find('h2').text()).to.equal('Brașov');
+          expect($box.find('p').text()).to.contain('596140');
+          bv.node().dispatchEvent(createEvent('mouseout'));
+
           done();
-        }
+        };
         var map = new Romania(validConfig);
       });
     })

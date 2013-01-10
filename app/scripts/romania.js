@@ -1,5 +1,5 @@
 /*global define:false */
-define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
+define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, topojson, $, Handlebars) {
   "use strict";
   var width = 960
     , height = 600;
@@ -48,6 +48,17 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
     if (['csv','tsv'].indexOf(result.datafileType) === -1) {
       throw new Error("Unsupported datafile type: " + result.datafileType + "." +
         "Only csv and tsv are supported at the moment. Please use the appropriate extension.");
+    }
+
+    if (config.infoBox) {
+      result.infoBox = $(config.infoBox);
+      var $templateEl = $(config.infoBoxTemplate);
+
+      if (!result.infoBox.length || !$templateEl.length) {
+        throw new Error("The info box element or template is not present in the page.");
+      }
+
+      result.infoBoxTemplate = Handlebars.compile($(config.infoBoxTemplate).html());
     }
 
     return result;
@@ -117,14 +128,18 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
   };
 
   Romania.prototype.hilight = function (element, d) {
-    if (this.config.infoBox) {
-      $(this.config.infoBox).show();
+    if (this.config.infoBox.length) {
+      var $infobox = this.config.infoBox
+        , data = this.data[d.id];
+      data.name = d3.select(element).datum().properties.name;
+      $infobox.html(this.config.infoBoxTemplate(data));
+      $infobox.show();
     }
   };
 
   Romania.prototype.unhilight = function (element, d) {
-    if (this.config.infoBox) {
-      $(this.config.infoBox).hide();
+    if (this.config.infoBox.length) {
+      this.config.infoBox.hide();
     } 
   };
 
