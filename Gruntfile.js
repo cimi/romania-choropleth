@@ -1,3 +1,4 @@
+/*global module:false */
 module.exports = function( grunt ) {
   'use strict';
   //
@@ -95,11 +96,15 @@ module.exports = function( grunt ) {
           boss: true,
           eqnull: true,
           browser: true,
-          laxcomma: true
+          laxcomma: true,
+          evil: true
         }
       },
       globals: {
-        jQuery: true
+        jQuery: true,
+        define: false,
+        require: false,
+        node: true
       }
     },
 

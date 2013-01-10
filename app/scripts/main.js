@@ -1,3 +1,4 @@
+/*global require:false */
 require.config({
   shim: {
     d3: {

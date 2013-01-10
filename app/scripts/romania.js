@@ -1,8 +1,8 @@
-define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, topojson, Handlebars, $) {
+/*global define:false */
+define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
   "use strict";
   var width = 960
-    , height = 600
-    , map;
+    , height = 600;
 
   var projections = {
     mercator : d3.geo.mercator()
@@ -51,12 +51,12 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
     }
 
     return result;
-  }
+  };
 
   var createFormulaFunction = function (formula) {
     var func = new Function('data', 'return ' + formula);
     return func;
-  }
+  };
 
   var processData = function (data) {
     var result = {};
@@ -64,12 +64,14 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
       result[val.id] = val;
     });
     return result;
-  }
+  };
 
   var Romania = function (config) {
     // enforce mandatory fields    
     ['title', 'datafile', 'formula', 'domain'].forEach(function (param) {
-      if (!config[param]) throw new Error (param + ' is not present in the configuration');
+      if (!config[param]) {
+        throw new Error (param + ' is not present in the configuration');
+      }
     });
     
     this.config = createConfig(config);
@@ -89,13 +91,18 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
   };
 
   var dataLoaded = function (error, topology, data) {
+    if (error) {
+      throw new Error("Datafiles could not be loaded correctly.", error);
+    }
+
     this.data = processData(data);
     var mapEl = d3.select(this.config.target).append('svg')
         .style('width', width)
         .style('height', height);
 
     var geojson = topojson.object(topology, topology.objects['romania-counties-geojson']);
-    var counties = mapEl.append('g')
+    // draw the counties
+    mapEl.append('g')
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
@@ -111,7 +118,7 @@ define(['d3', 'queue', 'topojson', 'handlebars', 'jquery'], function(d3, queue, 
     if (this.config.callback) {
       this.config.callback(this); 
     }
-  }
+  };
 
   Romania.prototype.getConfig = function () {
     return this.config;
