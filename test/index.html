@@ -4,6 +4,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>Mocha Spec Runner</title>
   <link rel="stylesheet" href="lib/mocha/mocha.css">
+  <style>
+    #myInfobox { display: none; };
+  </style>
 </head>
 <body>
   <div id="mocha"></div>
@@ -26,6 +29,11 @@
       }, 100);
     });
   </script> 
+
+  <script id="infoboxTemplate" type="text/x-handlebars-template">
+    <h2>{{name}}</h2>
+    <p>Population (2004): {{pop2004}}</p>
+  </script>
 
 </body>
 </html>

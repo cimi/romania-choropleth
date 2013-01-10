@@ -78,7 +78,7 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
     this.config.formula = createFormulaFunction(config.formula);
 
     // set the fill function depending on the configuration
-    this.fill = this.config.scale()
+    this.getFillColor = this.config.scale()
         .domain(this.config.domain)
         .range(this.config.range);
 
@@ -94,6 +94,7 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
     if (error) {
       throw new Error("Datafiles could not be loaded correctly.", error);
     }
+    var map = this;
 
     this.data = processData(data);
     var mapEl = d3.select(this.config.target).append('svg')
@@ -106,17 +107,33 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
-        .style("fill", $.proxy(function (d) {
-          var countyData = this.data[d.id];
-          if (countyData) {
-            return this.fill(this.config.formula(this.data[d.id]));   
-          } else {
-            return this.config.defaultFill;
-          }
-        }, this));
+        .style('fill', $.proxy(this.fill, this))
+        .on('mouseover', function (d) { map.hilight(this, d); })
+        .on('mouseout', function (d) { map.unhilight(this, d); });
 
     if (this.config.callback) {
       this.config.callback(this); 
+    }
+  };
+
+  Romania.prototype.hilight = function (element, d) {
+    if (this.config.infoBox) {
+      $(this.config.infoBox).show();
+    }
+  };
+
+  Romania.prototype.unhilight = function (element, d) {
+    if (this.config.infoBox) {
+      $(this.config.infoBox).hide();
+    } 
+  };
+
+  Romania.prototype.fill = function (d) {
+    var countyData = this.data[d.id];
+    if (countyData) {
+      return this.getFillColor(this.config.formula(this.data[d.id]));   
+    } else {
+      return this.config.defaultFill;
     }
   };
 
@@ -129,10 +146,10 @@ define(['d3', 'queue', 'topojson', 'jquery'], function(d3, queue, topojson, $) {
   };
 
   Romania.prototype.getCountyElement = function (id) {
-    return d3.selectAll('path').filter(function (d, i) {
-      return d.id == id;
+    return d3.selectAll('path').filter(function (d) {
+      return d.id === id;
     });
-  }
+  };
 
   return Romania;
 });

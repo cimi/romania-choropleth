@@ -20,6 +20,12 @@ require(['romania', 'jquery'], function (Romania, $) {
       $target.empty();
     });
 
+    var createEvent = function (eventType) {
+      var e = document.createEvent('UIEvents');
+      e.initUIEvent(eventType, true, true);
+      return e;
+    }
+
     describe('Configure the map', function () {
       beforeEach(function () {
         map = new Romania(validConfig);
@@ -153,20 +159,31 @@ require(['romania', 'jquery'], function (Romania, $) {
 
     describe('Create an infobox displaying requested data on mouseover', function () {
       it('should show a box with relevant information when hovering over a county and hide it when the cursor leaves it', function (done) {
-        validConfig.infobox = '#myInfobox';
+        validConfig.infoBox = '#myInfobox';
         validConfig.callback = function (map) {
-          expect($('#myInfobox').is(':visible')).to.be.false;
+          expect($('#myInfobox').is(':visible'), 'initially hidden').to.be.false;
           var bv = map.getCountyElement('BV');
-          $(bv[0][0]).mouseenter();
-          expect($('#myInfobox').is(':visible')).to.be.true;
-          $(bv[0][0]).mouseleave();
-          expect($('#myInfobox').is(':visible')).to.be.false;
+          bv.node().dispatchEvent(createEvent('mouseover'));
+          expect($('#myInfobox').is(':visible'), 'shown on mouseover').to.be.true;
+          bv.node().dispatchEvent(createEvent('mouseout'));
+          expect($('#myInfobox').is(':visible'), 'hidden on mouseout').to.be.false;
           done();
         }
         var map = new Romania(validConfig);
       });
-      it('should hide the box when the cursor leaves the county');
-      it('should have a template for data that gets rendered using the county\'s data');
+
+      it('should have a template for data that gets rendered using the county\'s data', function () {
+        validConfig.infoBox = '#myInfobox';
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV');
+          bv.node().dispatchEvent(createEvent('mouseover'));
+          
+          var $box = $(validConfig.infoBox);
+          expect($box.find('h2').text()).to.equal('Brașov');
+          done();
+        }
+        var map = new Romania(validConfig);
+      });
     })
   });
 });

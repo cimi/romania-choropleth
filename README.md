@@ -46,3 +46,4 @@ map.render();
 
 * __map.getConfig()__ - returns the current configuration of the map.
 * __map.getData()__ - returns the dataset associated with the map (what was read from the datafile).
+* __map.getCountyElement(id)__ - returns a d3 wrapped object of the specified county
