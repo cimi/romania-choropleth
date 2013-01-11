@@ -24,16 +24,3 @@ require.config({
     jquery: 'vendor/jquery.min'
   }
 });
-
-require(['romania'], function (Romania) {
-  var config = {
-    title: 'Sample map',
-    domain: [-1, 2],
-    range: ['brown', 'steelblue'],
-    defaultFill: 'black',
-    formula: 'data.members',
-    datafile: '/data/hp-team.csv',
-    target: '#map'
-  };
-  var map = new Romania(config);
-});

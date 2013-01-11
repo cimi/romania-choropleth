@@ -65,7 +65,7 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   var createFormulaFunction = function (formula) {
-    var func = new Function('data', 'console.log(data);return ' + formula);
+    var func = new Function('data', 'return ' + formula);
     return func;
   };
 
@@ -102,7 +102,6 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   var dataLoaded = function (error, topology, data) {
-    console.log(data)
     if (error) {
       throw new Error("Datafiles could not be loaded correctly.", error);
     }
@@ -129,7 +128,7 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   Romania.prototype.hilight = function (element, d) {
-    if (this.config.infoBox && this.config.infoBox.length) {
+    if (this.config.infoBox.length) {
       var $infobox = this.config.infoBox
         , data = this.data[d.id];
       data.name = d3.select(element).datum().properties.name;
@@ -139,15 +138,13 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   Romania.prototype.unhilight = function (element, d) {
-    if (this.config.infoBox && this.config.infoBox.length) {
+    if (this.config.infoBox.length) {
       this.config.infoBox.hide();
     } 
   };
 
   Romania.prototype.fill = function (d) {
     var countyData = this.data[d.id];
-    console.log(countyData, d.id);
-    console.log(this.config.formula);
     if (countyData) {
       return this.getFillColor(this.config.formula(this.data[d.id]));   
     } else {
