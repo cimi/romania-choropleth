@@ -118,6 +118,7 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
+        .attr('class', function (d) { return d.id; })
         .style('fill', $.proxy(this.fill, this))
         .on('mouseover', function (d) { map.hilight(this, d); })
         .on('mouseout', function (d) { map.unhilight(this, d); });
@@ -128,19 +129,24 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   Romania.prototype.hilight = function (element, d) {
-    if (this.config.infoBox.length) {
+    if (this.config.infoBox && this.config.infoBox.length) {
       var $infobox = this.config.infoBox
         , data = this.data[d.id];
       data.name = d3.select(element).datum().properties.name;
       $infobox.html(this.config.infoBoxTemplate(data));
       $infobox.show();
     }
+    d3.select(element).classed('hilight', true);
   };
 
   Romania.prototype.unhilight = function (element, d) {
-    if (this.config.infoBox.length) {
+    if (arguments.length === 1 && typeof arguments[0] === 'string') {
+      this.highlight(this.getCountyElement(arguments[0]), d);
+    }
+    if (this.config.infoBox && this.config.infoBox.length) {
       this.config.infoBox.hide();
-    } 
+    }
+    d3.select(element).classed('hilight', false);
   };
 
   Romania.prototype.fill = function (d) {

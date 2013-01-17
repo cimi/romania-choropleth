@@ -142,6 +142,33 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
 
+      it('should attach the county ID as a class name to the corresponding path element', function (done) {
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV');
+          expect(bv.classed('BV')).to.be.true;
+          expect(bv.classed('CT')).to.be.false;
+          done();
+        }
+        var map = new Romania(validConfig);
+      });
+
+      it('should add the "hilight" css class to a path element that is hilighted (API or mouseover)', function (done) {
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV')
+            , bvNode = bv.node();
+          bvNode.dispatchEvent(createEvent('mouseover'));
+          expect(bv.classed('hilight')).to.be.true;
+          bvNode.dispatchEvent(createEvent('mouseout'));
+          expect(bv.classed('hilight')).to.be.false;
+          map.hilight(bvNode);
+          expect(bv.classed('hilight')).to.be.true;
+          map.unhilight(bvNode);
+          expect(bv.classed('hilight')).to.be.false;
+          done();
+        };
+        var map = new Romania(validConfig);
+      });
+
       it('should color the map according to the data', function (done) {
         validConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
@@ -154,10 +181,23 @@ require(['romania', 'jquery'], function (Romania, $) {
         validConfig.scale = 'linear';
         var map = new Romania(validConfig);
       });
+
+      it('should redraw the map when the configuration is changed without reloading the data');
     });
 
 
     describe('Create an infobox displaying requested data on mouseover', function () {
+      it('mouseover should work even if the infobox is not defined', function () {
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV')
+            , bvNode = bv.node();
+          // TODO: find a way to catch errors thrown inside of event handlers
+          bvNode.dispatchEvent(createEvent('mouseover'));          
+        };
+
+        var map = new Romania(validConfig);
+      });
+
       it('should throw errors if the infobox or the template selectors are invalid', function () {
         validConfig.infoBox = '#myInfoBox';
         // missing template

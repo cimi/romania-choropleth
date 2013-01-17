@@ -24,3 +24,18 @@ require.config({
     jquery: 'vendor/jquery.min'
   }
 });
+
+  // require(['romania'], function (Romania) {
+  //   var config = {
+  //       title: 'Penis size',
+  //       datafile: '/data/test.csv',
+  //       domain: [0, 50],
+  //       formula: 'data.size',
+  //       target: '#map',
+  //       infoBox: '#infobox',
+  //       infoBoxTemplate: '#infoboxTemplate',
+  //       range: ['red', 'green'],
+  //       defaultFill: 'black'
+  //     };
+  //   var map = new Romania(config);
+  // });
