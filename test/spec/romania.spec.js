@@ -88,8 +88,8 @@ require(['romania', 'jquery'], function (Romania, $) {
 
     describe('Read the data and make it available', function () {
       var checkData = function (data) {
-        expect(data['BV'].name).to.equal('Brasov');
-        expect(data['B'].name).to.equal('Municipiul Bucuresti');        
+        expect(data['BV'].pop2004).to.equal('596140');
+        expect(data['B'].pop2004).to.equal('1927559');
       };
 
       it('should throw an error if the file extension is not supported', function () {
@@ -261,7 +261,7 @@ require(['romania', 'jquery'], function (Romania, $) {
       });
     });
 
-    describe('Allow an ifobox to toggle on hilight/unhilight with data from the target node available', function () {
+    describe('Allow an infobox to toggle on hilight/unhilight with data from the target node available in the template', function () {
       it('the default event should not throw errors even if the infobox is not defined', function () {
         initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
