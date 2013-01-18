@@ -7,9 +7,12 @@ require(['romania', 'jquery'], function (Romania, $) {
     beforeEach(function () {
       initialConfig = {
         title: 'test configuration',
-        datafile: '/data/romania-counties-population.tsv',
-        domain: [-500000, 500000],
-        formula: 'data.pop2004 - data.pop1956',
+        data: {
+          datafile: 'data/population.tsv',
+          domain: [-200000, 200000],
+          formula: 'data.pop2004 - data.pop1956',
+          scale: 'linear'
+        },
         target: '#myMap'
       };
       $target = $(initialConfig.target);
@@ -46,7 +49,9 @@ require(['romania', 'jquery'], function (Romania, $) {
       it('should enforce mandatory parameters in the configuration', function () {
         var incompleteConfig = {
           title: 'test configuration',
-          range: ['white', 'black']
+          data: {
+            range: ['white', 'black']
+          }
         };
         
         (function () {
@@ -61,28 +66,27 @@ require(['romania', 'jquery'], function (Romania, $) {
           expect(formulaFunc({id: 'BV', pop2004: '596140', pop1956: '373941'})).to.equal(222199);
           done();
         }
-        initialConfig.formula = 'data.pop2004 - data.pop1956';
         var map = new Romania(initialConfig);
       });
 
       it('should set the correct scale for the map coloring', function () {
         var config = map.getConfig();
-        expect(config.scale, 'the default scale').to.equal(d3.scale.linear);
+        expect(config.data.scale, 'the default scale').to.equal(d3.scale.linear);
 
         initialConfig.scale = 'log';
         map = new Romania(initialConfig);
         config = map.getConfig();
-        expect(config.scale, 'different scale').to.equal(d3.scale.log);
+        expect(config.data.scale, 'different scale').to.equal(d3.scale.log);
       });
 
       it('should have the default color range set to brown - steel blue', function () {
         var config = map.getConfig();
-        expect(config.range, 'the default range').to.deep.equal(['brown', 'steelblue']);
+        expect(config.data.range, 'the default range').to.deep.equal(['brown', 'steelblue']);
 
-        initialConfig.range = ['orange', 'purple'];
+        initialConfig.data.range = ['orange', 'purple'];
         map = new Romania(initialConfig);
         config = map.getConfig();
-        expect(config.range, 'custom color range').to.deep.equal(['orange', 'purple']);
+        expect(config.data.range, 'custom color range').to.deep.equal(['orange', 'purple']);
       });
     });
 
@@ -93,7 +97,7 @@ require(['romania', 'jquery'], function (Romania, $) {
       };
 
       it('should throw an error if the file extension is not supported', function () {
-        initialConfig.datafile = 'data/chec.xls';
+        initialConfig.data.datafile = 'data/chec.xls';
         (function () {
           new Romania(config);
         }).should.throw(Error);
@@ -119,7 +123,7 @@ require(['romania', 'jquery'], function (Romania, $) {
           expect(ct.style('fill')).to.equal(initialConfig.defaultFill);
           done();
         };
-        initialConfig.datafile = 'data/fixture.csv';
+        initialConfig.data.datafile = 'data/fixture.csv';
         initialConfig.defaultFill = '#bada55';
         var map = new Romania(initialConfig);
       });
@@ -159,13 +163,13 @@ require(['romania', 'jquery'], function (Romania, $) {
       it('should color the map according to the data', function (done) {
         initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
-          expect(bv.style('fill')).to.equal(initialConfig.range[1]);
+          expect(bv.style('fill')).to.equal(initialConfig.data.range[1]);
           done();
         };
         // setting the exact difference so we can test the upper bound
-        initialConfig.domain = [-200 * 1000, 222199];
-        initialConfig.range = ['red', '#800080'];
-        initialConfig.scale = 'linear';
+        initialConfig.data.domain = [-200 * 1000, 222199];
+        initialConfig.data.range = ['red', '#800080'];
+        initialConfig.data.scale = 'linear';
         var map = new Romania(initialConfig);
       });
 
@@ -222,7 +226,7 @@ require(['romania', 'jquery'], function (Romania, $) {
             expect(counters).to.deep.equal([1,1]);
             delete window.counters;
             done();  
-          }, 1000);
+          }, 100);
         };
         var hilightCallback = function (element, d) { 
           expect(d3.select(element).classed('BV')).to.be.true;

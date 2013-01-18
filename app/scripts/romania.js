@@ -16,20 +16,30 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
       .scale(7000)
   };
 
+  var TOPOJSON_FILE = 'data/romania-topo.json';
 
   var createConfig = function (config) {
-    var result = $.extend({}, config)
+    // enforce mandatory fields 
+    if (config.data) {
+      ['datafile', 'formula', 'domain'].forEach(function (param) {
+        if (!config.data[param]) {
+          throw new Error (param + ' is not present in the data configuration.');
+        }
+      });      
+    }
+    
+    var result = $.extend(true, {}, config)
       , checks = {
-        scale: d3.scale[config.scale],
         projection: projections[config.projection],
-        range: config.range,
         defaultFill: config.defaultFill,
         target: config.target,
         interaction: config.interaction
       }, defaults = {
-        scale: d3.scale.linear,
+        data: {
+          scale: d3.scale.linear,
+          range: ['brown', 'steelblue']
+        },
         projection: projections.albers,
-        range: ['brown', 'steelblue'],
         defaultFill: 'white',
         target: '#map',
         interaction: {
@@ -47,6 +57,18 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
       }
     });
 
+    if (!d3.scale[config.scale]) {
+      result.data.scale = defaults.data.scale;
+    } else {
+      result.data.scale = d3.scale[config.scale];
+    }
+
+    if (!config.data.range) {
+      result.data.range = defaults.data.range;
+    } else {
+      result.data.range = config.data.range;
+    }
+
     // if the interaction object was incomplete, copy the default events
     ['hilight', 'unhilight'].forEach(function (val) {
       if (!result.interaction[val]) {
@@ -62,11 +84,13 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
     });
 
     // remember the datafile type
-    result.datafileType = /\.([^.]+)$/.exec(config.datafile)[1];
+    if (config.data) {
+      result.data.datafileType = /\.([^.]+)$/.exec(config.data.datafile)[1];
 
-    if (['csv','tsv'].indexOf(result.datafileType) === -1) {
-      throw new Error("Unsupported datafile type: " + result.datafileType + "." +
-        "Only csv and tsv are supported at the moment. Please use the appropriate extension.");
+      if (['csv','tsv'].indexOf(result.data.datafileType) === -1) {
+        throw new Error("Unsupported datafile type: " + result.data.datafileType + "." +
+          "Only csv and tsv are supported at the moment. Please use the appropriate extension.");
+      }
     }
 
     if (config.infobox) {
@@ -97,28 +121,20 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
     return result;
   };
 
-  var Romania = function (config) {
-    // enforce mandatory fields    
-    ['title', 'datafile', 'formula', 'domain'].forEach(function (param) {
-      if (!config[param]) {
-        throw new Error (param + ' is not present in the configuration');
-      }
-    });
-    
+  var Romania = function (config) {    
     this.config = createConfig(config);
-    this.config.formula = createFormulaFunction(config.formula);
+    this.config.formula = createFormulaFunction(config.data.formula);
 
-    // set the fill function depending on the configuration
-    this.getFillColor = this.config.scale()
-        .domain(this.config.domain)
-        .range(this.config.range);
-
+    var loader = queue().defer(d3.json, TOPOJSON_FILE);
+    if (this.config.data) {
+      // set the fill function depending on the configuration
+      this.getFillColor = this.config.data.scale()
+          .domain(this.config.data.domain)
+          .range(this.config.data.range);
+      loader.defer(d3[this.config.data.datafileType], config.data.datafile);
+    }
     this.path = d3.geo.path().projection(this.config.projection);
-
-    queue()
-      .defer(d3.json, "/data/romania-counties-topojson.json")
-      .defer(d3[this.config.datafileType], config.datafile)
-      .await($.proxy(dataLoaded, this));
+    loader.await($.proxy(dataLoaded, this));
   };
 
   var dataLoaded = function (error, topology, data) {
