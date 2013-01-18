@@ -152,6 +152,23 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
 
+      it('should color the map according to the data', function (done) {
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV');
+          expect(bv.style('fill')).to.equal(validConfig.range[1]);
+          done();
+        };
+        // setting the exact difference so we can test the upper bound
+        validConfig.domain = [-200 * 1000, 222199];
+        validConfig.range = ['red', '#800080'];
+        validConfig.scale = 'linear';
+        var map = new Romania(validConfig);
+      });
+
+      it('should redraw the map when the configuration is changed without reloading the data');
+    });
+
+    describe('Allow the behavior of hilight/unhilight to be configurable', function () {
       it('should add the "hilight" css class to a path element that is hilighted (API or mouseover)', function (done) {
         validConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
@@ -169,25 +186,66 @@ require(['romania', 'jquery'], function (Romania, $) {
         var map = new Romania(validConfig);
       });
 
-      it('should color the map according to the data', function (done) {
+      it('should support custom definitions of hilight and unhilight events', function (done) {
         validConfig.callback = function (map) {
-          var bv = map.getCountyElement('BV');
-          expect(bv.style('fill')).to.equal(validConfig.range[1]);
+          var bv = map.getCountyElement('BV')
+            , bvNode = bv.node();
+          expect(bv.classed('hilight')).to.be.false;
+          bvNode.dispatchEvent(createEvent('mousedown'));
+          expect(bv.classed('hilight')).to.be.true;
+          bvNode.dispatchEvent(createEvent('mouseup'));
+          expect(bv.classed('hilight')).to.be.false;
           done();
         };
-        // setting the exact difference so we can test the upper bound
-        validConfig.domain = [-200 * 1000, 222199];
-        validConfig.range = ['red', '#800080'];
-        validConfig.scale = 'linear';
+        validConfig.interaction = {
+          hilight: { event: 'mousedown' },
+          unhilight: { event: 'mouseup' }
+        };
+
         var map = new Romania(validConfig);
       });
 
-      it('should redraw the map when the configuration is changed without reloading the data');
+      it('should support hilight and unhilight event code injection', function (done) {
+        window.counters = [0, 0];
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV')
+            , bvNode = bv.node();
+          bvNode.dispatchEvent(createEvent('mouseover'));
+          bvNode.dispatchEvent(createEvent('mouseout'));
+          setTimeout(function () {
+            expect(counters).to.deep.equal([1,1]);
+            delete window.counters;
+            done();  
+          }, 1000);
+        };
+        var hilightCallback = function (element, d) { 
+          expect(d3.select(element).classed('BV')).to.be.true;
+          expect(d.id).to.equal('BV');
+          console.log('in');
+          counters[0] += 1;
+        };
+        var unhilightCallback = function (element, d) {
+          expect(d3.select(element).classed('BV')).to.be.true;
+          expect(d.id).to.equal('BV');
+          console.log('out');
+          counters[1] += 1;
+        };
+
+        validConfig.interaction = {
+          hilight: { callback: hilightCallback }, 
+          unhilight: { callback: unhilightCallback }
+        };
+        var map = new Romania(validConfig);
+      });
+
+      it('should not trigger any hilight if the event is set to false in the config', function (done) {
+        
+      });
     });
 
 
     describe('Create an infobox displaying requested data on mouseover', function () {
-      it('mouseover should work even if the infobox is not defined', function () {
+      it('mouseover should not throw errors even if the infobox is not defined', function () {
         validConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
@@ -199,48 +257,51 @@ require(['romania', 'jquery'], function (Romania, $) {
       });
 
       it('should throw errors if the infobox or the template selectors are invalid', function () {
-        validConfig.infoBox = '#myInfoBox';
+        validConfig.infobox = { target: '#myInfoBox' };
         // missing template
         (function () {
           var map = new Romania(validConfig); 
         }).should.throw(Error);
 
-        validConfig.infoBox = '#missingElement';
+        validConfig.infobox = { target: '#missingElement', template: '#infoboxTemplate' };
         (function () {
           var map = new Romania(validConfig); 
         }).should.throw(Error);
 
-        validConfig.infoBox = '#myInfobox';
-        validConfig.infoBoxTemplate = '#wrongTemplate';
+        validConfig.infobox = { target: '#myInfobox', template: '#wrongTemplate' };
         (function () {
           var map = new Romania(validConfig); 
         }).should.throw(Error);
       });
 
       it('should show a box with relevant information when hovering over a county and hide it when the cursor leaves it', function (done) {
-        validConfig.infoBox = '#myInfobox';
-        validConfig.infoBoxTemplate = '#infoboxTemplate';
+        validConfig.infobox = {
+          target: '#myInfobox',
+          template: '#infoboxTemplate'
+        };
         validConfig.callback = function (map) {
           expect($('#myInfobox').is(':visible'), 'initially hidden').to.be.false;
           var bv = map.getCountyElement('BV');
           bv.node().dispatchEvent(createEvent('mouseover'));
-          expect($('#myInfobox').is(':visible'), 'shown on mouseover').to.be.true;
+          expect($('#myInfobox').is(':visible'), 'does not show on mouseover').to.be.true;
           bv.node().dispatchEvent(createEvent('mouseout'));
-          expect($('#myInfobox').is(':visible'), 'hidden on mouseout').to.be.false;
+          expect($('#myInfobox').is(':visible'), 'does not hide on mouseout').to.be.false;
           done();
         }
         var map = new Romania(validConfig);
       });
 
       it('should have a template for data that gets rendered using the county\'s data', function (done) {
-        validConfig.infoBox = '#myInfobox';
-        validConfig.infoBoxTemplate = '#infoboxTemplate';
+        validConfig.infobox = {
+          target: '#myInfobox',
+          template: '#infoboxTemplate'
+        };
 
         validConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
           bv.node().dispatchEvent(createEvent('mouseover'));
           
-          var $box = $(validConfig.infoBox);
+          var $box = $(validConfig.infobox.target);
           expect($box.find('h2').text()).to.equal('Brașov');
           expect($box.find('p').text()).to.contain('596140');
           bv.node().dispatchEvent(createEvent('mouseout'));

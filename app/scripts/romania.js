@@ -24,13 +24,18 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
         projection: projections[config.projection],
         range: config.range,
         defaultFill: config.defaultFill,
-        target: config.target
+        target: config.target,
+        interaction: config.interaction,
       }, defaults = {
         scale: d3.scale.linear,
         projection: projections.albers,
         range: ['brown', 'steelblue'],
         defaultFill: 'white',
-        target: '#map'
+        target: '#map',
+        interaction: {
+          hilight: { event: 'mouseover' },
+          unhilight: { event: 'mouseout' }
+        }
       };
     
     // put in defaults
@@ -42,6 +47,13 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
       }
     });
 
+    // if the interaction object was incomplete, copy the default events
+    ['hilight', 'unhilight'].forEach(function (val) {
+      if (typeof result.interaction[val].event === 'undefined') {
+        result.interaction[val].event = defaults.interaction[val].event;
+      }
+    });
+
     // remember the datafile type
     result.datafileType = /\.([^.]+)$/.exec(config.datafile)[1];
 
@@ -50,15 +62,16 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
         "Only csv and tsv are supported at the moment. Please use the appropriate extension.");
     }
 
-    if (config.infoBox) {
-      result.infoBox = $(config.infoBox);
-      var $templateEl = $(config.infoBoxTemplate);
+    if (config.infobox) {
+      result.infobox = {};
+      result.infobox.target = $(config.infobox.target);
+      var $templateEl = $(config.infobox.template);
 
-      if (!result.infoBox.length || !$templateEl.length) {
-        throw new Error("The info box element or template is not present in the page.");
+      if (!result.infobox.target.length || !$templateEl.length) {
+        throw new Error("The info box element or template are not present in the page.");
       }
 
-      result.infoBoxTemplate = Handlebars.compile($(config.infoBoxTemplate).html());
+      result.infobox.template = Handlebars.compile($templateEl.html());
     }
 
     return result;
@@ -120,8 +133,8 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
         .enter().append('path').attr('d', this.path)
         .attr('class', function (d) { return d.id; })
         .style('fill', $.proxy(this.fill, this))
-        .on('mouseover', function (d) { map.hilight(this, d); })
-        .on('mouseout', function (d) { map.unhilight(this, d); });
+        .on(this.config.interaction.hilight.event, function (d) { map.hilight(this, d); })
+        .on(this.config.interaction.unhilight.event, function (d) { map.unhilight(this, d); });
 
     if (this.config.callback) {
       this.config.callback(this); 
@@ -129,24 +142,33 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   Romania.prototype.hilight = function (element, d) {
-    if (this.config.infoBox && this.config.infoBox.length) {
-      var $infobox = this.config.infoBox
+    if (arguments.length === 1 && typeof arguments[0] === 'string') {
+      return this.hilight(this.getCountyElement(arguments[0]), d);
+    }
+    if (this.config.infobox) {
+      var $infobox = this.config.infobox.target
         , data = this.data[d.id];
       data.name = d3.select(element).datum().properties.name;
-      $infobox.html(this.config.infoBoxTemplate(data));
+      $infobox.html(this.config.infobox.template(data));
       $infobox.show();
     }
     d3.select(element).classed('hilight', true);
+    if (this.config.interaction && this.config.interaction.hilight.callback) {
+      this.config.interaction.hilight.callback(element, d);
+    }
   };
 
   Romania.prototype.unhilight = function (element, d) {
     if (arguments.length === 1 && typeof arguments[0] === 'string') {
-      this.highlight(this.getCountyElement(arguments[0]), d);
+      return this.unhilight(this.getCountyElement(arguments[0]), d);
     }
-    if (this.config.infoBox && this.config.infoBox.length) {
-      this.config.infoBox.hide();
+    if (this.config.infobox) {
+      this.config.infobox.target.hide();
     }
     d3.select(element).classed('hilight', false);
+    if (this.config.interaction && this.config.interaction.unhilight.callback) {
+      this.config.interaction.unhilight.callback(element, d);
+    }
   };
 
   Romania.prototype.fill = function (d) {

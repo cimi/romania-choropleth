@@ -28,17 +28,50 @@ The supported properties are:
 * __formula (mandatory)__ - which parts of the data are used to compute the fill of the counties. 
 * __domain (mandatory)__ - the upper and lower bounds for the color representations on the map, i.e. if the corresponding value for a county is equal to a bound or outside the bounds, it will be colorized with the edge color from the range.
 * __target__ - the selector of the element in which the map will be drawn in. If not specified, defaults to `#map`.
-* __infobox__ - if specified, on mouseover there will be an infobox displayed with the data for the selected county. You should fill in a selector that identifies the element. If a selector that matches multiple elements is used (e.g. `div`, `.info`), the first match found will be used.
-* __infoboxTemplate__ - selector for an element containing a handlebars template that controls what gets displayed in the infobox.
 * __scale__ - the scale for the data representation. Read more in the [d3 documentation](https://github.com/mbostock/d3/wiki/Quantitative-Scales). Currently only linear and logarithmic are supported. If none specified or invalid, defaults to linear.
 * __projection__ - which projection to use when drawing the map. To better understand projections read the [d3 documentation](https://github.com/mbostock/d3/wiki/Geo-Projections). The two supported projections are Albers and Mercator. The default and preferred one is Albers, because it is an area preserving projection.
 * __range__ - the colors to transition between. Defaults to `['brown', 'steelblue']`.
 * __defaultFill__ - the fill color for the counties that do not have data specified in the datafile, in case you do not want to represent data for all of them. If not specified defaults to white.
-* __callback__ - a function that gets executed when all the data is loaded.
-* __hilightEvent__ - the event that triggers a hilight behavior. Defaults to `mouseover`. If set to `false`, no event will trigger the hilight.
-* __unhilightEvent__ - the event that triggers the converse behavior to the above, from the hilight state to come back to the normal state.
-* __hilight__ - a function with custom behavior for when the hilight event is triggered automatically (via the API) or via UI events.
-* __unhilight__ - complementary to the above, this function relates to the unhilight event.
+* __callback__ - a function that gets executed when all the data is loaded. It receives one argument, the Romania object created.
+
+````javascript
+config.callback = function (map) {
+  // do stuff with map, the data is loaded and the map is drawn
+}
+````
+* __interaction__ - de
+  ** __hilight__
+    *** __event__ - the event that triggers a hilight behavior. Defaults to `mouseover`. If set to `false`, no event will trigger the hilight.
+    *** __callback__ - a function that will execute when the hilight event is triggered, via API or UI event.
+  ** __unhilight__
+    *** __event__ - same as for `hilight`
+    *** __callback__ - same as for `hilight`
+
+Example:
+
+````javascript
+config.interaction = {
+  hilight: {
+    event: 'mousedown',
+    callback: function (element, d) {
+      console.log(element + ' was clicked, it had data ' + d);
+    }
+  }, unhilight: {
+    event: 'mouseup'
+  }
+};
+````
+
+* __infobox__ - if specified, on hilight there will be an infobox displayed with the data for the hilighted county. 
+  ** __target__ - selector that identifies the element inside which the information will be displayed. If a selector that matches multiple elements is used (e.g. `div`, `.info`), the first match found will be used.
+  ** __template__ - selector for an element containing a handlebars template that controls what gets displayed in the infobox.
+
+````javascript
+config.infobox = {
+  target: '#myInfobox',
+  template: '.infoboxTemplate'
+};
+````
 
 Once you create your configuration object, rendering a map is as simple as:
 
