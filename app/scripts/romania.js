@@ -25,7 +25,7 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
         range: config.range,
         defaultFill: config.defaultFill,
         target: config.target,
-        interaction: config.interaction,
+        interaction: config.interaction
       }, defaults = {
         scale: d3.scale.linear,
         projection: projections.albers,
@@ -49,8 +49,15 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
 
     // if the interaction object was incomplete, copy the default events
     ['hilight', 'unhilight'].forEach(function (val) {
+      if (!result.interaction[val]) {
+        result.interaction[val] = {};
+      }
       if (typeof result.interaction[val].event === 'undefined') {
         result.interaction[val].event = defaults.interaction[val].event;
+      }
+
+      if (result.interaction[val].event === false) {
+        delete result.interaction[val];
       }
     });
 
@@ -127,14 +134,18 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
 
     var geojson = topojson.object(topology, topology.objects['romania-counties-geojson']);
     // draw the counties
-    mapEl.append('g')
+    var countyEls = mapEl.append('g')
         .attr('class', 'counties')
         .selectAll('path').data(geojson.geometries)
         .enter().append('path').attr('d', this.path)
         .attr('class', function (d) { return d.id; })
-        .style('fill', $.proxy(this.fill, this))
-        .on(this.config.interaction.hilight.event, function (d) { map.hilight(this, d); })
-        .on(this.config.interaction.unhilight.event, function (d) { map.unhilight(this, d); });
+        .style('fill', $.proxy(this.fill, this));
+
+    ['hilight', 'unhilight'].forEach(function (action) {
+      if (map.config.interaction[action]) {
+        countyEls.on(map.config.interaction[action].event, function (d) { map[action](this, d); });
+      }
+    });
 
     if (this.config.callback) {
       this.config.callback(this); 

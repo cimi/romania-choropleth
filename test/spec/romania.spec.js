@@ -239,7 +239,22 @@ require(['romania', 'jquery'], function (Romania, $) {
       });
 
       it('should not trigger any hilight if the event is set to false in the config', function (done) {
-        
+        validConfig.callback = function (map) {
+          var bv = map.getCountyElement('BV')
+            , bvNode = bv.node();
+          expect(bv.classed('hilight')).to.be.false;
+          bvNode.dispatchEvent(createEvent('mouseover'));
+          expect(bv.classed('hilight')).to.be.false;
+          done();
+        }
+        validConfig.interaction = {
+          hilight: {
+            event: false,
+            callback: function (element, d) { throw new Error('shouldn\'t execute'); }
+          }
+        };
+        var map = new Romania(validConfig);
+
       });
     });
 
