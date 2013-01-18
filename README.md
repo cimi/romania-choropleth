@@ -2,30 +2,49 @@
 
 #### See a demo [here](http://improve.ro/sandbox/romania/).
 
-## Creating your map
+## Creating a map
 
 First, you need to create a configuration object for your map:
 
 ````javascript
 var config = {
   title: 'Population variation between 1948 and 2004'
-  datafile: 'data/romania-counties-population.tsv',
-  formula: 'data.pop2004 - data.pop1956',
-  infobox: '#infobox',
-  infoboxTemplate: '#infoboxTemplate',
-  scale: 'linear',
+  data: {
+    datafile: 'data/romania-counties-population.tsv',
+    domain: [-200000, 200000],
+    formula: 'data.pop2004 - data.pop1956',
+    range: ['red', 'steelblue'],
+    scale: 'linear'
+  },
   projection: 'albers',
-  domain: [-200000, 200000],
   defaultFill: 'white',
-  range: ['red', 'steelblue']
+  infobox: {
+    target: '#infobox',
+    template: '#infoboxTemplate'
+  }  
 }
 ````
 
-The supported properties are:
+Once you create your configuration object, rendering a map is as simple as:
 
-* __title (mandatory)__ - the title of the map; it will be displayed in the legend. 
-* __datafile (mandatory)__ - the data source, it will be loaded asynchronously; the current supported formats are csv and tsv. The format is determined from the file extension.
-* __formula (mandatory)__ - which parts of the data are used to compute the fill of the counties. The data is made available in the formula through the `data` object. The property names are read from the datafile and are the same as those in the objects returned from `map.getData()`. You can use any type of mathematical operator in the formula or any native JavaScript functions.
+````javascript
+var map = new Romania(config);
+````
+
+## The Configuration Object
+
+* __title__ - the title of the map; it will be displayed in the legend.
+
+* __target__ - the selector of the element in which the map will be drawn in. If not specified, defaults to `#map`.
+
+* __projection__ - which projection to use when drawing the map. To better understand projections read the [d3 documentation](https://github.com/mbostock/d3/wiki/Geo-Projections). The two supported projections are Albers and Mercator. The default and preferred one is Albers, because it is an area preserving projection.
+
+* __defaultFill__ - the fill color for the counties that do not have data specified in the datafile, in case you do not want to represent data for all of them. If not specified defaults to white.
+
+* __data__ - if associated data is present, this defines how to load and interpret it.
+    * __datafile (mandatory)__ - the data source, it will be loaded asynchronously; the current supported formats are csv and tsv. The format is determined from the file extension.
+    
+    * __formula (mandatory)__ - which parts of the data are used to compute the fill of the counties. The data is made available in the formula through the `data` object. The property names are read from the datafile and are the same as those in the objects returned from `map.getData()`. You can use any type of mathematical operator in the formula or any native JavaScript functions.
 
     Examples:
     ````javascript
@@ -34,13 +53,13 @@ The supported properties are:
     // using a more complicated mathematical formula
     config.formula = '(data.gdp / data.population) + (data.gdb / data.area)';
     ````
+    
+    * __domain (mandatory)__ - the upper and lower bounds for the color representations on the map, i.e. if the corresponding value for a county is equal to a bound or outside the bounds, it will be colorized with the edge color from the range.
 
-* __domain (mandatory)__ - the upper and lower bounds for the color representations on the map, i.e. if the corresponding value for a county is equal to a bound or outside the bounds, it will be colorized with the edge color from the range.
-* __target__ - the selector of the element in which the map will be drawn in. If not specified, defaults to `#map`.
-* __scale__ - the scale for the data representation. Read more in the [d3 documentation](https://github.com/mbostock/d3/wiki/Quantitative-Scales). Currently only linear and logarithmic are supported. If none specified or invalid, defaults to linear.
-* __projection__ - which projection to use when drawing the map. To better understand projections read the [d3 documentation](https://github.com/mbostock/d3/wiki/Geo-Projections). The two supported projections are Albers and Mercator. The default and preferred one is Albers, because it is an area preserving projection.
-* __range__ - the colors to transition between. Defaults to `['brown', 'steelblue']`.
-* __defaultFill__ - the fill color for the counties that do not have data specified in the datafile, in case you do not want to represent data for all of them. If not specified defaults to white.
+    * __scale__ - the scale for the data representation. Read more in the [d3 documentation](https://github.com/mbostock/d3/wiki/Quantitative-Scales). Currently only linear and logarithmic are supported. If none specified or invalid, defaults to linear.
+    
+    * __range__ - the colors to transition between. Defaults to `['brown', 'steelblue']`.
+
 * __callback__ - a function that gets executed when all the data is loaded. It receives one argument, the Romania object created.
 
     Example:
@@ -60,7 +79,7 @@ The supported properties are:
 
     Example:
 
-  	````javascript
+    ````javascript
     config.interaction = {
       hilight: {
         event: 'mousedown',
@@ -85,17 +104,34 @@ The supported properties are:
     };
     ````
 
-Once you create your configuration object, rendering a map is as simple as:
-
-````
-var map = new Romania(config);
-map.render();
-````
-
 ## API Reference
 
-* __map.getConfig()__ - returns the current configuration of the map.
-* __map.getData()__ - returns the dataset associated with the map (what was read from the datafile).
-* __map.getCountyElement(id)__ - returns a d3 wrapped object of the specified county
-* __map.hilight(id)__ - highlights the country with `id`.
-* __map.unhilight(id)__ - unhighlights the country with `id`.
+* __map.getData()__ - returns the dataset associated with the map (what was read from the datafile). It is mapped by county ID to the data read from the file.
+    
+    Example:
+
+    ````javascript
+    var map = new Romania(config),
+      , data = map.getData();
+
+    console.log(data['B']); // { a: 1000, b:2000, c:3000 }
+    ````
+    
+    The datafile would look like:
+    ````
+    id,a,b,c
+    B,1000,2000,3000
+    BV,1001,2001,3001,
+    [...]
+    
+* __map.getCountyElement(id)__ - returns a d3 wrapped object of the SVG `path` representing the desired county.
+* __map.hilight(id)__ - hilights the desired county.
+* __map.unhilight(id)__ - unhilights the desired county.
+
+## Where The Data Comes From
+
+The TopoJSON file used to draw the map in D3 comes was converted by me from a shapefile downloaded from [this site hosted on the domain of the University of Bucharest](http://earth.unibuc.ro/download/romania-seturi-vectoriale). The author of the shapefile is Vasile Crăciunescu.
+
+I converted the shapefile with GDAL (`ogr2ogr`) into GeoJSON. I cleaned up the data (incorrectly encoded Romanian characters for the county names), added to each county an ID - I used the two letter abbreviation used in our vehicle system - and separated the population information in an external datafile.
+
+I used [TopoJSON](https://github.com/mbostock/topojson/) to further compress the GeoJSON obtained in the previous step. This brought it down from 14 MB to **68 KB**! However, it's worth mentioning that I didn't look into GDAL to see how the conversion to GeoJSON could be optimized, since I was targeting TopoJSON from the start.
