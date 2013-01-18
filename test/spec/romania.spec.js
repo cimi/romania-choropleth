@@ -2,21 +2,22 @@ require(['romania', 'jquery'], function (Romania, $) {
   "use strict";
   describe('Choropleth Map Generator For Romania', function() {
     
-    var validConfig, $target, map;
+    var initialConfig, $target, map;
+
     beforeEach(function () {
-      validConfig = {
+      initialConfig = {
         title: 'test configuration',
         datafile: '/data/romania-counties-population.tsv',
         domain: [-500000, 500000],
         formula: 'data.pop2004 - data.pop1956',
         target: '#myMap'
       };
-      $target = $(validConfig.target);
+      $target = $(initialConfig.target);
       $target.hide();
     });
 
     afterEach(function () {
-      validConfig.callback = undefined;
+      initialConfig.callback = undefined;
       $target.empty();
     });
 
@@ -26,47 +27,50 @@ require(['romania', 'jquery'], function (Romania, $) {
       return e;
     }
 
+    var DEFAULT_HILIGHT_EVENT = createEvent('mouseover')
+      , DEFAULT_UNHILIGHT_EVENT = createEvent('mouseout');
+
     describe('Configure the map', function () {
       beforeEach(function () {
-        map = new Romania(validConfig);
+        map = new Romania(initialConfig);
       });
 
       it('should return a fully populated configuration after instantiation without altering the original object', function () {
         var config = map.getConfig();
-        expect(config).to.not.equal(validConfig);
+        expect(config).to.not.equal(initialConfig);
         ['title', 'datafile', 'domain'].forEach(function (field) {
-          expect(config[field]).to.equal(validConfig[field]);
+          expect(config[field]).to.equal(initialConfig[field]);
         });
       });
 
       it('should enforce mandatory parameters in the configuration', function () {
-        var config = {
+        var incompleteConfig = {
           title: 'test configuration',
           range: ['white', 'black']
         };
         
         (function () {
-          new Romania(config);
+          new Romania(incompleteConfig);
         }).should.throw(Error);
       });
 
       it('should generate a function from the formula', function (done) {
-        validConfig.callback = function (map) {        
+        initialConfig.callback = function (map) {        
           var formulaFunc = map.getConfig().formula;
           expect(formulaFunc).to.be.an.instanceOf(Function);
           expect(formulaFunc({id: 'BV', pop2004: '596140', pop1956: '373941'})).to.equal(222199);
           done();
         }
-        validConfig.formula = 'data.pop2004 - data.pop1956';
-        var map = new Romania(validConfig);
+        initialConfig.formula = 'data.pop2004 - data.pop1956';
+        var map = new Romania(initialConfig);
       });
 
       it('should set the correct scale for the map coloring', function () {
         var config = map.getConfig();
         expect(config.scale, 'the default scale').to.equal(d3.scale.linear);
 
-        validConfig.scale = 'log';
-        map = new Romania(validConfig);
+        initialConfig.scale = 'log';
+        map = new Romania(initialConfig);
         config = map.getConfig();
         expect(config.scale, 'different scale').to.equal(d3.scale.log);
       });
@@ -75,8 +79,8 @@ require(['romania', 'jquery'], function (Romania, $) {
         var config = map.getConfig();
         expect(config.range, 'the default range').to.deep.equal(['brown', 'steelblue']);
 
-        validConfig.range = ['orange', 'purple'];
-        map = new Romania(validConfig);
+        initialConfig.range = ['orange', 'purple'];
+        map = new Romania(initialConfig);
         config = map.getConfig();
         expect(config.range, 'custom color range').to.deep.equal(['orange', 'purple']);
       });
@@ -89,80 +93,80 @@ require(['romania', 'jquery'], function (Romania, $) {
       };
 
       it('should throw an error if the file extension is not supported', function () {
-        validConfig.datafile = 'data/chec.xls';
+        initialConfig.datafile = 'data/chec.xls';
         (function () {
           new Romania(config);
         }).should.throw(Error);
       })
 
       it('should support tsv', function (done) {  
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var data = map.getData();
           expect(Object.keys(data)).to.have.length(42);
           checkData(data);
           done();
         };
 
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should support csv and should support datafiles without all counties specified', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var data = map.getData();
           expect(Object.keys(data)).to.have.length(2);
           checkData(data);
           var ct = map.getCountyElement('CT');
-          expect(ct.style('fill')).to.equal(validConfig.defaultFill);
+          expect(ct.style('fill')).to.equal(initialConfig.defaultFill);
           done();
         };
-        validConfig.datafile = 'data/fixture.csv';
-        validConfig.defaultFill = '#bada55';
-        var map = new Romania(validConfig);
+        initialConfig.datafile = 'data/fixture.csv';
+        initialConfig.defaultFill = '#bada55';
+        var map = new Romania(initialConfig);
       });
     });
 
     describe('Render the map and color it', function () {
       it('should draw the map and render it on the screen', function (done) {
-        validConfig.callback = function () {
+        initialConfig.callback = function () {
           expect($target.children()).to.have.length(1);
           expect($target.find('path')).to.have.length(42);
           done();
         };
         
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should allow you to select a county element based on its ID', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
           expect(bv).to.exist;
           expect(bv.datum().properties.name).to.equal('Brașov');
           done();
         }
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should attach the county ID as a class name to the corresponding path element', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
           expect(bv.classed('BV')).to.be.true;
           expect(bv.classed('CT')).to.be.false;
           done();
         }
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should color the map according to the data', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
-          expect(bv.style('fill')).to.equal(validConfig.range[1]);
+          expect(bv.style('fill')).to.equal(initialConfig.range[1]);
           done();
         };
         // setting the exact difference so we can test the upper bound
-        validConfig.domain = [-200 * 1000, 222199];
-        validConfig.range = ['red', '#800080'];
-        validConfig.scale = 'linear';
-        var map = new Romania(validConfig);
+        initialConfig.domain = [-200 * 1000, 222199];
+        initialConfig.range = ['red', '#800080'];
+        initialConfig.scale = 'linear';
+        var map = new Romania(initialConfig);
       });
 
       it('should redraw the map when the configuration is changed without reloading the data');
@@ -170,12 +174,12 @@ require(['romania', 'jquery'], function (Romania, $) {
 
     describe('Allow the behavior of hilight/unhilight to be configurable', function () {
       it('should add the "hilight" css class to a path element that is hilighted (API or mouseover)', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
-          bvNode.dispatchEvent(createEvent('mouseover'));
+          bvNode.dispatchEvent(DEFAULT_HILIGHT_EVENT);
           expect(bv.classed('hilight')).to.be.true;
-          bvNode.dispatchEvent(createEvent('mouseout'));
+          bvNode.dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
           expect(bv.classed('hilight')).to.be.false;
           map.hilight(bvNode);
           expect(bv.classed('hilight')).to.be.true;
@@ -183,13 +187,15 @@ require(['romania', 'jquery'], function (Romania, $) {
           expect(bv.classed('hilight')).to.be.false;
           done();
         };
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should support custom definitions of hilight and unhilight events', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
+          expect(bv.classed('hilight')).to.be.false;
+          bvNode.dispatchEvent(DEFAULT_HILIGHT_EVENT);
           expect(bv.classed('hilight')).to.be.false;
           bvNode.dispatchEvent(createEvent('mousedown'));
           expect(bv.classed('hilight')).to.be.true;
@@ -197,21 +203,21 @@ require(['romania', 'jquery'], function (Romania, $) {
           expect(bv.classed('hilight')).to.be.false;
           done();
         };
-        validConfig.interaction = {
+        initialConfig.interaction = {
           hilight: { event: 'mousedown' },
           unhilight: { event: 'mouseup' }
         };
 
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should support hilight and unhilight event code injection', function (done) {
         window.counters = [0, 0];
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
-          bvNode.dispatchEvent(createEvent('mouseover'));
-          bvNode.dispatchEvent(createEvent('mouseout'));
+          bvNode.dispatchEvent(DEFAULT_HILIGHT_EVENT);
+          bvNode.dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
           setTimeout(function () {
             expect(counters).to.deep.equal([1,1]);
             delete window.counters;
@@ -221,109 +227,105 @@ require(['romania', 'jquery'], function (Romania, $) {
         var hilightCallback = function (element, d) { 
           expect(d3.select(element).classed('BV')).to.be.true;
           expect(d.id).to.equal('BV');
-          console.log('in');
           counters[0] += 1;
         };
         var unhilightCallback = function (element, d) {
           expect(d3.select(element).classed('BV')).to.be.true;
           expect(d.id).to.equal('BV');
-          console.log('out');
           counters[1] += 1;
         };
 
-        validConfig.interaction = {
+        initialConfig.interaction = {
           hilight: { callback: hilightCallback }, 
           unhilight: { callback: unhilightCallback }
         };
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should not trigger any hilight if the event is set to false in the config', function (done) {
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
           expect(bv.classed('hilight')).to.be.false;
-          bvNode.dispatchEvent(createEvent('mouseover'));
+          bvNode.dispatchEvent(DEFAULT_HILIGHT_EVENT);
           expect(bv.classed('hilight')).to.be.false;
           done();
         }
-        validConfig.interaction = {
+        initialConfig.interaction = {
           hilight: {
             event: false,
             callback: function (element, d) { throw new Error('shouldn\'t execute'); }
           }
         };
-        var map = new Romania(validConfig);
-
+        var map = new Romania(initialConfig);
       });
     });
 
-
-    describe('Create an infobox displaying requested data on mouseover', function () {
-      it('mouseover should not throw errors even if the infobox is not defined', function () {
-        validConfig.callback = function (map) {
+    describe('Allow an ifobox to toggle on hilight/unhilight with data from the target node available', function () {
+      it('the default event should not throw errors even if the infobox is not defined', function () {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV')
             , bvNode = bv.node();
           // TODO: find a way to catch errors thrown inside of event handlers
-          bvNode.dispatchEvent(createEvent('mouseover'));          
+          bvNode.dispatchEvent(DEFAULT_HILIGHT_EVENT);          
         };
 
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should throw errors if the infobox or the template selectors are invalid', function () {
-        validConfig.infobox = { target: '#myInfoBox' };
+        initialConfig.infobox = { target: '#myInfoBox' };
         // missing template
         (function () {
-          var map = new Romania(validConfig); 
+          var map = new Romania(initialConfig); 
         }).should.throw(Error);
 
-        validConfig.infobox = { target: '#missingElement', template: '#infoboxTemplate' };
+        initialConfig.infobox = { target: '#missingElement', template: '#infoboxTemplate' };
         (function () {
-          var map = new Romania(validConfig); 
+          var map = new Romania(initialConfig); 
         }).should.throw(Error);
 
-        validConfig.infobox = { target: '#myInfobox', template: '#wrongTemplate' };
+        initialConfig.infobox = { target: '#myInfobox', template: '#wrongTemplate' };
         (function () {
-          var map = new Romania(validConfig); 
+          var map = new Romania(initialConfig); 
         }).should.throw(Error);
       });
 
       it('should show a box with relevant information when hovering over a county and hide it when the cursor leaves it', function (done) {
-        validConfig.infobox = {
+        initialConfig.infobox = {
           target: '#myInfobox',
           template: '#infoboxTemplate'
         };
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           expect($('#myInfobox').is(':visible'), 'initially hidden').to.be.false;
           var bv = map.getCountyElement('BV');
-          bv.node().dispatchEvent(createEvent('mouseover'));
+          bv.node().dispatchEvent(DEFAULT_HILIGHT_EVENT);
           expect($('#myInfobox').is(':visible'), 'does not show on mouseover').to.be.true;
-          bv.node().dispatchEvent(createEvent('mouseout'));
+          bv.node().dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
           expect($('#myInfobox').is(':visible'), 'does not hide on mouseout').to.be.false;
           done();
         }
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
 
       it('should have a template for data that gets rendered using the county\'s data', function (done) {
-        validConfig.infobox = {
+        initialConfig.infobox = {
           target: '#myInfobox',
           template: '#infoboxTemplate'
         };
 
-        validConfig.callback = function (map) {
+        initialConfig.callback = function (map) {
           var bv = map.getCountyElement('BV');
-          bv.node().dispatchEvent(createEvent('mouseover'));
+          bv.node().dispatchEvent(DEFAULT_HILIGHT_EVENT);
           
-          var $box = $(validConfig.infobox.target);
+          var $box = $(initialConfig.infobox.target);
           expect($box.find('h2').text()).to.equal('Brașov');
           expect($box.find('p').text()).to.contain('596140');
-          bv.node().dispatchEvent(createEvent('mouseout'));
+          bv.node().dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
 
           done();
         };
-        var map = new Romania(validConfig);
+        var map = new Romania(initialConfig);
       });
     })
   });
