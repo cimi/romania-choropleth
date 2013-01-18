@@ -1,5 +1,11 @@
 ## Overview
 
+This project aims to provide an easy way to render a map of Romania and colorize it according to variable data. It's based on [D3.js](http://d3js.org/) and [TopoJSON](https://github.com/mbostock/topojson/). It also uses jQuery and Handlebars.
+
+Structurally, is built around [Yeoman](http://yeoman.io) and [RequireJS](http://requirejs.org) but I am planning to create a standalone version for it. The purpose is to be able to load it in any page just by dropping a `<script>` tag.
+
+To create your own maps, feel free to fork this repo and play around with the data.
+
 #### See a demo [here](http://improve.ro/sandbox/romania/).
 
 ## Creating a map
