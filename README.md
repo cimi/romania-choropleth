@@ -34,6 +34,11 @@ The supported properties are:
 * __projection__ - which projection to use when drawing the map. To better understand projections read the [d3 documentation](https://github.com/mbostock/d3/wiki/Geo-Projections). The two supported projections are Albers and Mercator. The default and preferred one is Albers, because it is an area preserving projection.
 * __range__ - the colors to transition between. Defaults to `['brown', 'steelblue']`.
 * __defaultFill__ - the fill color for the counties that do not have data specified in the datafile, in case you do not want to represent data for all of them. If not specified defaults to white.
+* __callback__ - a function that gets executed when all the data is loaded.
+* __hilightEvent__ - the event that triggers a hilight behavior. Defaults to `mouseover`. If set to `false`, no event will trigger the hilight.
+* __unhilightEvent__ - the event that triggers the converse behavior to the above, from the hilight state to come back to the normal state.
+* __hilight__ - a function with custom behavior for when the hilight event is triggered automatically (via the API) or via UI events.
+* __unhilight__ - complementary to the above, this function relates to the unhilight event.
 
 Once you create your configuration object, rendering a map is as simple as:
 
@@ -47,3 +52,5 @@ map.render();
 * __map.getConfig()__ - returns the current configuration of the map.
 * __map.getData()__ - returns the dataset associated with the map (what was read from the datafile).
 * __map.getCountyElement(id)__ - returns a d3 wrapped object of the specified county
+* __map.hilight(id)__ - highlights the country with `id`.
+* __map.unhilight(id)__ - unhighlights the country with `id`.
