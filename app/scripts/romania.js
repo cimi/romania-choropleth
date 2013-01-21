@@ -197,6 +197,10 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
 
   Romania.prototype.fill = function (d) {
     if (this.data && this.data[d.id]) {
+      // augment data with the name;
+      // can't do it anywhere else, here we're guaranteed
+      // we have both the name and the data available.
+      this.data[d.id].name = d.properties.name;
       var countyData = this.data[d.id];
       countyData.formulaResult = this.config.formula(countyData); 
       return this.getFillColor(countyData.formulaResult);   

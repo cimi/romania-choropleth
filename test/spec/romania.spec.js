@@ -94,6 +94,7 @@ require(['romania', 'jquery'], function (Romania, $) {
       var checkData = function (data) {
         expect(data['BV'].pop2004).to.equal('596140');
         expect(data['B'].pop2004).to.equal('1927559');
+        expect(data['BV'].name).to.equal('Brașov');
       };
 
       it('should throw an error if the file extension is not supported', function () {
