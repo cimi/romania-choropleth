@@ -17,14 +17,22 @@
         <script src="scripts/vendor/modernizr.min.js"></script>
     </head>
     <body>
-    <div class="container" style="margin-top:50px">
+    <div id="demo" class="container" style="margin-top:50px">
         <div id="map"></div>
         <div id="infobox"></div>
+        <table id="topThree">
+            <caption>Judetele cu cea mai mare crestere in populatie</caption>
+            <th></th>
+        </table>
+        <table id="bottomThree">
+            <caption>Judetele cu cea mai mare scadere in populatie</caption>
+            <th></th>
+        </table>
     </div>
 
-    <script id="infoboxTemplate" type="text/x-handlebars-template">
-        <h2>{{id}}</h2>
-        <p>Population: {{properties.POP2004}}</p>
+    <script id="template" type="text/x-handlebars-template">
+        <h2>{{name}}</h2>
+        <p>Population difference (2004 - 1956): <strong>{{formulaResult}}</strong> ({{pop2004}} - {{pop1956}})</p>
     </script>
 
         <!--[if lt IE 7]>

@@ -25,17 +25,50 @@ require.config({
   }
 });
 
-  // require(['romania'], function (Romania) {
-  //   var config = {
-  //       title: 'Penis size',
-  //       datafile: '/data/test.csv',
-  //       domain: [0, 50],
-  //       formula: 'data.size',
-  //       target: '#map',
-  //       infoBox: '#infobox',
-  //       infoBoxTemplate: '#infoboxTemplate',
-  //       range: ['red', 'green'],
-  //       defaultFill: 'black'
-  //     };
-  //   var map = new Romania(config);
-  // });
+
+if ($('#demo').length) {
+  require(['romania'], function (Romania) {
+    var topThree = function (map) {
+      var data = map.getData()
+        , tmp = []
+        , three = { top: [], bottom: [] };
+
+      $.each(data, function (key, value) {
+        tmp.push({id: key, diff: value.formulaResult});
+      });
+
+      tmp.sort(function (a, b) { return a.diff - b.diff });
+      var tableRowTemplate = Handlebars.compile('<tr><td>{{id}}<td>{{diff}}');
+      three.top = tmp.slice(0, 3);
+      three.bottom = tmp.slice(tmp.length - 3).reverse();
+      ['top', 'bottom'].forEach(function (set) {
+        three[set].forEach(function (county) {
+          $('#' + set + 'Three').append(tableRowTemplate(county));
+        });
+      });
+    };
+    var config = {
+        data: {
+          datafile: '/data/population.tsv',
+          domain: [-100 * 1000, 100 * 1000],
+          formula: 'data.pop2004 - data.pop1956',
+          range: ['red', 'steelblue']
+        },
+        target: '#map',
+        infobox: {
+          target: '#infobox',
+          template: '#template'
+        },
+        interaction: {
+          hilight: {
+            callback: function (element, d) {
+              $('#infobox').css('background-color', d3.select(element).style('fill'));
+            }
+          }
+        },
+        callback : topThree
+      };
+    var map = new Romania(config);
+  });  
+}
+

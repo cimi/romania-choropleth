@@ -189,9 +189,6 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
     if (arguments.length === 1 && typeof arguments[0] === 'string') {
       return this.unhilight(this.getCountyElement(arguments[0]), d);
     }
-    if (this.config.infobox) {
-      this.config.infobox.target.hide();
-    }
     d3.select(element).classed('hilight', false);
     if (this.config.interaction && this.config.interaction.unhilight.callback) {
       this.config.interaction.unhilight.callback(element, d);
@@ -199,9 +196,10 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
   };
 
   Romania.prototype.fill = function (d) {
-    var countyData = this.data[d.id];
-    if (countyData) {
-      return this.getFillColor(this.config.formula(this.data[d.id]));   
+    if (this.data && this.data[d.id]) {
+      var countyData = this.data[d.id];
+      countyData.formulaResult = this.config.formula(countyData); 
+      return this.getFillColor(countyData.formulaResult);   
     } else {
       return this.config.defaultFill;
     }

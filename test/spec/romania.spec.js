@@ -306,7 +306,6 @@ require(['romania', 'jquery'], function (Romania, $) {
           bv.node().dispatchEvent(DEFAULT_HILIGHT_EVENT);
           expect($('#myInfobox').is(':visible'), 'does not show on mouseover').to.be.true;
           bv.node().dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
-          expect($('#myInfobox').is(':visible'), 'does not hide on mouseout').to.be.false;
           done();
         }
         var map = new Romania(initialConfig);
@@ -325,8 +324,8 @@ require(['romania', 'jquery'], function (Romania, $) {
           var $box = $(initialConfig.infobox.target);
           expect($box.find('h2').text()).to.equal('Brașov');
           expect($box.find('p').text()).to.contain('596140');
+          expect($box.find('p.formulaResult').text()).to.contain('222199');
           bv.node().dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
-
           done();
         };
         var map = new Romania(initialConfig);
