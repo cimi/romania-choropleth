@@ -34,11 +34,12 @@ if ($('#demo').length) {
         , three = { top: [], bottom: [] };
 
       $.each(data, function (key, value) {
-        tmp.push({id: key, name: value.name, diff: value.formulaResult});
+        tmp.push({id: key, name: value.name, diff: value.formulaResult, pop2004: parseInt(value.pop2004)});
       });
 
       var setIndex = function (idxName) {
         return function (val, idx) {
+          console.log(val.id, idx, val.diff, val.pop2004)
           data[val.id][idxName] = 42 - idx;
         }
       }
@@ -54,7 +55,6 @@ if ($('#demo').length) {
       var tableRowTemplate = Handlebars.compile('<tr><td>{{name}}<td>{{diff}}');
       ['top', 'bottom'].forEach(function (set) {
         three[set].forEach(function (county) {
-          console.log(county)
           $('#' + set + 'Three').append(tableRowTemplate(county));
         });
       });
