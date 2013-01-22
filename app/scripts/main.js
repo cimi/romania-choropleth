@@ -63,7 +63,7 @@ if ($('#demo').length) {
     var defaultInfoboxContents = $('#infobox').html();
     var config = {
         data: {
-          datafile: '/data/population.tsv',
+          datafile: 'data/population.tsv',
           domain: [-100 * 1000, 100 * 1000],
           formula: 'data.pop2004 - data.pop1956',
           range: ['red', 'steelblue']
