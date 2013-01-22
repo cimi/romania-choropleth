@@ -139,3 +139,5 @@ The TopoJSON file used to draw the map in D3 comes was converted by me from a sh
 I converted the shapefile with GDAL (`ogr2ogr`) into GeoJSON. I cleaned up the data (incorrectly encoded Romanian characters for the county names), added to each county an ID - I used the two letter abbreviation used in our vehicle system - and separated the population information in an external datafile.
 
 I used [TopoJSON](https://github.com/mbostock/topojson/) to further compress the GeoJSON obtained in the previous step. This brought it down from 14 MB to **68 KB**! However, it's worth mentioning that I didn't look into GDAL to see how the conversion to GeoJSON could be optimized, since I was targeting TopoJSON from the start.
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>
