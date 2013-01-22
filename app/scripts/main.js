@@ -28,25 +28,39 @@ require.config({
 
 if ($('#demo').length) {
   require(['romania'], function (Romania) {
-    var topThree = function (map) {
+    var mapLoaded = function (map) {
       var data = map.getData()
         , tmp = []
         , three = { top: [], bottom: [] };
 
       $.each(data, function (key, value) {
-        tmp.push({id: key, diff: value.formulaResult});
+        tmp.push({id: key, name: value.name, diff: value.formulaResult});
       });
 
+      var setIndex = function (idxName) {
+        return function (val, idx) {
+          data[val.id][idxName] = 42 - idx;
+        }
+      }
+
       tmp.sort(function (a, b) { return a.diff - b.diff });
-      var tableRowTemplate = Handlebars.compile('<tr><td>{{id}}<td>{{diff}}');
-      three.top = tmp.slice(0, 3);
-      three.bottom = tmp.slice(tmp.length - 3).reverse();
+      tmp.forEach(setIndex('diffIdx'));
+      three.bottom = tmp.slice(0, 3);
+      three.top = tmp.slice(tmp.length - 3).reverse();
+
+      tmp.sort(function (a, b) { return a.pop2004 - b.pop2004 });
+      tmp.forEach(setIndex('popIdx'));
+
+      var tableRowTemplate = Handlebars.compile('<tr><td>{{name}}<td>{{diff}}');
       ['top', 'bottom'].forEach(function (set) {
         three[set].forEach(function (county) {
+          console.log(county)
           $('#' + set + 'Three').append(tableRowTemplate(county));
         });
       });
     };
+
+    var defaultInfoboxContents = $('#infobox').html();
     var config = {
         data: {
           datafile: '/data/population.tsv',
@@ -64,11 +78,14 @@ if ($('#demo').length) {
             callback: function (element, d) {
               $('#infobox').css('background-color', d3.select(element).style('fill'));
             }
+          }, unhilight: {
+            callback: function (element, d) {
+              $('#infobox').html(defaultInfoboxContents);
+            }
           }
         },
-        callback : topThree
+        callback : mapLoaded
       };
     var map = new Romania(config);
   });  
 }
-

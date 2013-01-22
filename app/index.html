@@ -11,28 +11,31 @@
         <meta name="viewport" content="width=device-width">
 
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-
-        
         <link rel="stylesheet" href="styles/main.css">
         <script src="scripts/vendor/modernizr.min.js"></script>
     </head>
     <body>
     <div id="demo" class="container" style="margin-top:50px">
-        <div id="map"></div>
-        <div id="infobox"></div>
+        <h1>Diferența de populație (2004 - 1956)<br /> în fiecare din județele României</h1>
         <table id="topThree">
-            <caption>Judetele cu cea mai mare crestere in populatie</caption>
-            <th></th>
+            <caption>Județele cu cea mai mare creștere în populație</caption>
+            <thead><tr><th>Nume</th><th>Diferență</th></tr></thead>
         </table>
         <table id="bottomThree">
-            <caption>Judetele cu cea mai mare scadere in populatie</caption>
-            <th></th>
+            <caption>Județele cu cea mai mare scădere în populație</caption>
+            <thead><tr><th>Nume</th><th>Diferență</th></tr></thead>
         </table>
+        <div id="infobox">
+            <p>Mutând cursorul peste oricare județ puteți vedea diferența de populație dintre 1956 și 2004.</p>
+            <p>Spectrul de culori reflectă cât de mult a scăzut (roșu) sau crescut (albastru).</p>
+        </div>
+        <div id="map"></div>
     </div>
 
     <script id="template" type="text/x-handlebars-template">
         <h2>{{name}}</h2>
-        <p>Population difference (2004 - 1956): <strong>{{formulaResult}}</strong> ({{pop2004}} - {{pop1956}})</p>
+        <p>Diferență (2004 - 1956): <strong>{{formulaResult}}</strong> 
+        <br />{{pop2004}} - {{pop1956}}</p>
     </script>
 
         <!--[if lt IE 7]>

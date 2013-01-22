@@ -175,7 +175,6 @@ define(['d3', 'queue', 'topojson', 'jquery', 'handlebars'], function(d3, queue, 
     if (this.config.infobox) {
       var $infobox = this.config.infobox.target
         , data = this.data[d.id];
-      data.name = d3.select(element).datum().properties.name;
       $infobox.html(this.config.infobox.template(data));
       $infobox.show();
     }

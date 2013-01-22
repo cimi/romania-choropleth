@@ -13,12 +13,18 @@ path {
 .container {
 	width: 960px;
 	margin: auto;
+	h1 {
+		text-align: center;
+	}
 }
 
 #infobox {
 	background: #bada55;
+	clear: both;
 	@include border-radius(25px);
 	max-width: 300px;
+	min-height: 120px;
+	padding: 10px;
 	margin: auto;
 	text-align: center;
 }
