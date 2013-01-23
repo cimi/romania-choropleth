@@ -1,5 +1,5 @@
 {
-  "name": "Romania Choropleth",
+  "name": "romania-choropleth",
   "main": "app/scripts/romania.js",
   "version": "1.0",
   "dependencies": {
