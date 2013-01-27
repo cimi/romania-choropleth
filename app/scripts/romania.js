@@ -17,8 +17,6 @@
         .scale(7000)
     };
 
-    var TOPOJSON_FILE = 'data/romania-topo.json';
-
     var createConfig = function (config) {
       // enforce mandatory fields 
       if (config.data) {
@@ -34,6 +32,7 @@
           projection: projections[config.projection],
           defaultFill: config.defaultFill,
           target: config.target,
+          topoJSON: config.topoJSON,
           interaction: config.interaction
         }, defaults = {
           data: {
@@ -41,6 +40,7 @@
             range: ['brown', 'steelblue']
           },
           projection: projections.albers,
+          topoJSON: 'data/romania-topo.json',
           defaultFill: 'white',
           target: '#map',
           interaction: {
@@ -126,7 +126,7 @@
       this.config = createConfig(config);
       this.config.formula = createFormulaFunction(config.data.formula);
 
-      var loader = queue().defer(d3.json, TOPOJSON_FILE);
+      var loader = queue().defer(d3.json, this.config.topoJSON);
       if (this.config.data) {
         // set the fill function depending on the configuration
         this.getFillColor = this.config.data.scale()
