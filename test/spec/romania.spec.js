@@ -47,6 +47,17 @@
           });
         });
 
+        it('should create a simple map, even if no config was specified', function (done) {
+          var config = {
+            callback: function () {
+              console.log($target);
+              expect($('#map').find('path')).to.have.length(42);
+              done();
+            }
+          }
+          var map = new Romania(config);
+        });
+
         it('should enforce mandatory parameters in the configuration', function () {
           var incompleteConfig = {
             title: 'test configuration',
@@ -74,7 +85,7 @@
           var config = map.getConfig();
           expect(config.data.scale, 'the default scale').to.equal(d3.scale.linear);
 
-          initialConfig.scale = 'log';
+          initialConfig.data.scale = 'log';
           map = new Romania(initialConfig);
           config = map.getConfig();
           expect(config.data.scale, 'different scale').to.equal(d3.scale.log);
@@ -328,6 +339,7 @@
             expect($box.find('p').text()).to.contain('596140');
             expect($box.find('p.formulaResult').text()).to.contain('222199');
             bv.node().dispatchEvent(DEFAULT_UNHILIGHT_EVENT);
+            $(initialConfig.infobox.target).empty();
             done();
           };
           var map = new Romania(initialConfig);

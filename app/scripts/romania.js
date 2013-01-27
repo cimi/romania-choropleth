@@ -30,7 +30,6 @@
       var result = $.extend(true, {}, config)
         , checks = {
           projection: projections[config.projection],
-          defaultFill: config.defaultFill,
           target: config.target,
           topoJSON: config.topoJSON,
           interaction: config.interaction
@@ -41,7 +40,6 @@
           },
           projection: projections.albers,
           topoJSON: 'data/romania-topo.json',
-          defaultFill: 'white',
           target: '#map',
           interaction: {
             hilight: { event: 'mouseover' },
@@ -58,16 +56,19 @@
         }
       });
 
-      if (!d3.scale[config.scale]) {
-        result.data.scale = defaults.data.scale;
-      } else {
-        result.data.scale = d3.scale[config.scale];
-      }
+      if (config.data) {
+        result.formula = createFormulaFunction(config.data.formula);
+        if (config.data && !d3.scale[config.data.scale]) {
+          result.data.scale = defaults.data.scale;
+        } else {
+          result.data.scale = d3.scale[config.data.scale];
+        }
 
-      if (!config.data.range) {
-        result.data.range = defaults.data.range;
-      } else {
-        result.data.range = config.data.range;
+        if (!config.data.range) {
+          result.data.range = defaults.data.range;
+        } else {
+          result.data.range = config.data.range;
+        }
       }
 
       // if the interaction object was incomplete, copy the default events
@@ -116,18 +117,19 @@
 
     var processData = function (data) {
       var result = {};
-      data.forEach(function (val) {
-        result[val.id] = val;
-      });
+      if (data) {
+        data.forEach(function (val) {
+          result[val.id] = val;
+        });
+      }
       return result;
     };
 
     var Romania = function (config) {    
       this.config = createConfig(config);
-      this.config.formula = createFormulaFunction(config.data.formula);
 
       var loader = queue().defer(d3.json, this.config.topoJSON);
-      if (this.config.data) {
+      if (this.config.data && this.config.data.datafile) {
         // set the fill function depending on the configuration
         this.getFillColor = this.config.data.scale()
             .domain(this.config.data.domain)
@@ -204,7 +206,7 @@
         var countyData = this.data[d.id];
         countyData.formulaResult = this.config.formula(countyData); 
         return this.getFillColor(countyData.formulaResult);   
-      } else {
+      } else if (this.config.defaultFill) {
         return this.config.defaultFill;
       }
     };
