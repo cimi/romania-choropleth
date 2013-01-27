@@ -1,7 +1,7 @@
 {
   "name": "romania-choropleth",
   "main": "app/scripts/romania.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
     "d3": "~3.0.2",
     "queue": "https://raw.github.com/mbostock/queue/master/queue.js",
