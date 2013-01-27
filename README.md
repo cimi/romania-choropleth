@@ -4,16 +4,13 @@ This project aims to provide an easy way to render a map of Romania and colorize
 
 Structurally, is built around [Yeoman](http://yeoman.io) and [RequireJS](http://requirejs.org).
 
-#### See a demo [here](http://improve.ro/sandbox/romania/).
+#### See a live demo [here](http://improve.ro/sandbox/romania/).
 
 ## How to use it
 
 The module offers conditional AMD support (RequireJS), which means you can use it with or without require present in the page.
 
-````html
-````
-
-
+[This example](http://bl.ocks.org/d/4486121/) shows how you can use it without AMD. An example of use with AMD is in [the demo](https://github.com/cimi/romania-choropleth/blob/master/app/scripts/demo.js) included in this repository.
 
 ## Creating a map
 
@@ -43,6 +40,8 @@ Once you create your configuration object, rendering a map is as simple as:
 ````javascript
 var map = new Romania(config);
 ````
+
+Currently, the map's dimensions are fixed (960x600 px), but I plan to add support for variable dimensions in the future.
 
 ## The Configuration Object
 
@@ -149,4 +148,5 @@ I converted the shapefile with GDAL (`ogr2ogr`) into GeoJSON. I cleaned up the d
 
 I used [TopoJSON](https://github.com/mbostock/topojson/) to further compress the GeoJSON obtained in the previous step. This brought it down from 14 MB to **68 KB**! However, it's worth mentioning that I didn't look into GDAL to see how the conversion to GeoJSON could be optimized, since I was targeting TopoJSON from the start.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>
+<div style="text-align:center">
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a></div>
