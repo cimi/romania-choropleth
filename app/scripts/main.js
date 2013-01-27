@@ -20,13 +20,17 @@ require.config({
     queue: '../components/queue/index',
     topojson: '../components/topojson/index',
     handlebars: '../components/handlebars/handlebars-1.0.0-rc.1',
-    demo: 'demo',
     romania: 'romania',
+    PopulationDemo: 'PopulationDemo',
+    SimpleDemo: 'SimpleDemo',
     jquery: 'vendor/jquery.min'
   }
 });
 
-
-if ($('#demo').length) {
-  require(['demo']);
-}
+require(['jquery'], function ($) {
+  ['PopulationDemo', 'SimpleDemo'].forEach(function (demo) {
+    if ($('#' + demo).length) {
+      require([demo]);
+    }
+  });
+});

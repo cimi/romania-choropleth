@@ -1,10 +1,14 @@
 ## Overview
 
-This project aims to provide an easy way to render a map of Romania and colorize it according to variable data. It's based on [D3.js](http://d3js.org/) and [TopoJSON](https://github.com/mbostock/topojson/). It also uses jQuery and Handlebars.
+This project aims to provide an easy way to render a map of Romania and colorize it according to variable data. You can create a choropleth map of Romania just by referencing a csv or tsv data file and declaring a configuration object.
+
+#### See a live demo [here](http://improve.ro/sandbox/romania/) - population difference across counties.
+
+You are not forced to have a dataset to build a map. Each county has a css class with its ID ('B' for Bucharest, 'BV' for Brașov etc.). You can colorize the map and add any type of events to the counties without having a dataset available. See this simple example.
+
+It's based on [D3.js](http://d3js.org/) and [TopoJSON](https://github.com/mbostock/topojson/). It also uses jQuery and Handlebars.
 
 Structurally, is built around [Yeoman](http://yeoman.io) and [RequireJS](http://requirejs.org).
-
-#### See a live demo [here](http://improve.ro/sandbox/romania/).
 
 ## How to use it
 
