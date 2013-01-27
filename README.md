@@ -4,7 +4,7 @@ This project aims to provide an easy way to render a map of Romania and colorize
 
 #### See a live demo [here](http://improve.ro/sandbox/romania/) - population difference across counties.
 
-You are not forced to have a dataset to build a map. Each county has a css class with its abbreviation ('B' for Bucharest, 'BV' for Brașov etc.). You can colorize the map and add any type of events to the counties without having a dataset available. See [this simple example] that shows the Romanian provinces colored only through CSS.
+You are not forced to have a dataset to build a map. Each county has a css class with its abbreviation ('B' for Bucharest, 'BV' for Brașov etc.). You can colorize the map and add any type of events to the counties without having a dataset available. See [this simple example](http://improve.ro/sandbox/romania/simple.html) that shows the Romanian provinces colored only through CSS.
 
 The project is based on [D3.js](http://d3js.org/) and [TopoJSON](https://github.com/mbostock/topojson/). It also uses jQuery and Handlebars. Structurally, is built around [Yeoman](http://yeoman.io) and [RequireJS](http://requirejs.org).
 
@@ -142,7 +142,11 @@ Currently, the map's dimensions are fixed (960x600 px), but I plan to add suppor
 * __map.hilight(id)__ - hilights the desired county.
 * __map.unhilight(id)__ - unhilights the desired county.
 
-## Where The Data Comes From
+## Browser support
+
+The project was built and tested in Chrome. Internet Explorer is not supported and most likely doesn't work.
+
+## Where the data comes from
 
 The TopoJSON file used to draw the map in D3 comes was converted by me from a shapefile downloaded from [this site hosted on the domain of the University of Bucharest](http://earth.unibuc.ro/download/romania-seturi-vectoriale). The author of the shapefile is Vasile Crăciunescu.
 

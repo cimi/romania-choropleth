@@ -1,4 +1,5 @@
 /*global require:false */
+"use strict";
 require.config({
   shim: {
     d3: {
@@ -27,10 +28,14 @@ require.config({
   }
 });
 
-require(['jquery'], function ($) {
+require(['jquery', 'Romania', 'PopulationDemo', 'SimpleDemo'], function ($, Romania, PopulationDemo, SimpleDemo) {
+  var configs = {
+    'PopulationDemo': PopulationDemo,
+    'SimpleDemo': SimpleDemo
+  };
   ['PopulationDemo', 'SimpleDemo'].forEach(function (demo) {
     if ($('#' + demo).length) {
-      require([demo]);
+      var map = new Romania(configs[demo]);
     }
   });
 });

@@ -58,5 +58,5 @@ define(['romania'], function (Romania) {
     },
     callback : mapLoaded
   };
-  var map = new Romania(config);
+  return config;
 });
