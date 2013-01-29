@@ -4,7 +4,7 @@
   "version": "1.0.2",
   "dependencies": {
     "d3": "~3.0.2",
-    "queue": "~1.0.1",
+    "queue": "git://github.com/mbostock/queue.git",
     "topojson": "~0.0.10",
     "handlebars": "~1.0.0-rc.1"
   }
