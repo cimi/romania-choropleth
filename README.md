@@ -10,7 +10,13 @@ The project is based on [D3.js](http://d3js.org/) and [TopoJSON](https://github.
 
 ## How to use it
 
-The module offers conditional AMD support (RequireJS), which means you can use it with or without require present in the page.
+You can download the library and all its dependencies via bower:
+
+````
+bower install romania-choropleth
+````
+
+The module offers conditional AMD support (RequireJS), which means you can use it with or without an AMD loader. I've only tested it with require.js, but other loaders should work as well.
 
 [This example](http://bl.ocks.org/d/4486121/) shows how you can use it without AMD. An example of use with AMD is in [the demo](https://github.com/cimi/romania-choropleth/blob/master/app/scripts/demo.js) included in this repository.
 
