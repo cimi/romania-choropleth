@@ -1,11 +1,11 @@
 {
   "name": "romania-choropleth",
-  "main": "app/scripts/romania.js",
-  "version": "1.0.1",
+  "main": "./app/scripts/romania.js",
+  "version": "1.0.2",
   "dependencies": {
     "d3": "~3.0.2",
-    "queue": "https://raw.github.com/mbostock/queue/master/queue.js",
-    "topojson": "https://raw.github.com/mbostock/topojson/master/topojson.js",
+    "queue": "~1.0.1",
+    "topojson": "~0.0.10",
     "handlebars": "~1.0.0-rc.1"
   }
 }
