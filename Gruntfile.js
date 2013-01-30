@@ -124,6 +124,7 @@ module.exports = function( grunt ) {
 
     // concat css/**/*.css files, inline @import, output a single minified css
     css: {
+      'styles/main.css': ['styles/main.css'],
       'styles/all.css': ['styles/**/*.css']
     },
 
