@@ -18,8 +18,8 @@ require.config({
 
   paths: {
     d3: '../components/d3/d3',
-    queue: '../components/queue/index',
-    topojson: '../components/topojson/index',
+    queue: '../components/queue/queue',
+    topojson: '../components/topojson/topojson',
     handlebars: '../components/handlebars/handlebars-1.0.0-rc.1',
     romania: 'romania',
     PopulationDemo: 'PopulationDemo',
