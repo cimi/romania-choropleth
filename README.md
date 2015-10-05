@@ -143,7 +143,7 @@ Currently, the map's dimensions are fixed (960x600 px), but I plan to add suppor
     B,1000,2000,3000
     BV,1001,2001,3001,
     [...]
-    
+    ```
 * __map.getCountyElement(id)__ - returns a d3 wrapped object of the SVG `path` representing the desired county.
 * __map.hilight(id)__ - hilights the desired county.
 * __map.unhilight(id)__ - unhilights the desired county.
