@@ -1,0 +1,40 @@
+@import "compass_twitter_bootstrap";
+@import "_common";
+
+path {
+	fill-opacity: 0.7;
+	@include transition-duration(0.5s);
+	@include transition-property(fill-opacity);
+	&.hilight { 
+		fill-opacity: 1;
+		
+	};
+}
+
+.container {
+	width: 960px;
+	margin: auto;
+	h1 {
+		text-align: center;
+	}
+}
+
+#infobox {
+	background: #bada55;
+	clear: both;
+	@include border-radius(25px);
+	max-width: 300px;
+	min-height: 120px;
+	padding: 10px;
+	margin: auto;
+	text-align: center;
+}
+
+#topThree, #bottomThree {
+	@extend .table-hover;
+	@extend .table-bordered;
+	float: left;
+	margin: 20px;
+	width: 400px;
+	text-align: center;
+}

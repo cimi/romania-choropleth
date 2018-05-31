@@ -1,0 +1,12 @@
+.container {
+	width: 960px;
+	margin: auto;
+	#map svg {
+		width: 960px;
+		height: 600px;
+	}
+	#license {
+		text-align: center;
+		margin: 30px auto;
+	}
+}

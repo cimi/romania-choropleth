@@ -1,0 +1,67 @@
+/* line 1, ../../app/styles/_common.scss */
+.container {
+  width: 960px;
+  margin: auto;
+}
+/* line 4, ../../app/styles/_common.scss */
+.container #map svg {
+  width: 960px;
+  height: 600px;
+}
+/* line 8, ../../app/styles/_common.scss */
+.container #license {
+  text-align: center;
+  margin: 30px auto;
+}
+
+/* line 3, ../../app/styles/simple.scss */
+h1 {
+  color: #333333;
+  display: block;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 36px;
+  font-weight: bold;
+  height: 80px;
+  line-height: 40px;
+  margin-bottom: 10px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 10px;
+  text-align: center;
+  text-rendering: optimizelegibility;
+  width: 960px;
+}
+
+/* line 21, ../../app/styles/simple.scss */
+#map path {
+  fill-opacity: 0.8;
+}
+/* line 27, ../../app/styles/simple.scss */
+#map .BV, #map .TM, #map .CV, #map .HR, #map .CS,
+#map .AR, #map .BH, #map .SM, #map .MM, #map .SJ,
+#map .CJ, #map .AB, #map .SB, #map .BN, #map .HD,
+#map .MS {
+  fill: blue;
+}
+/* line 32, ../../app/styles/simple.scss */
+#map .TR, #map .IF, #map .GR, #map .DB, #map .PH,
+#map .IF, #map .VL, #map .AG, #map .GJ, #map .IL,
+#map .CL, #map .BR, #map .BZ, #map .B {
+  fill: #E6E600;
+  stroke: gray;
+}
+/* line 36, ../../app/styles/simple.scss */
+#map .GJ, #map .VL, #map .OT, #map .DJ, #map .MH {
+  fill: gold;
+  stroke: gray;
+}
+/* line 40, ../../app/styles/simple.scss */
+#map .TL, #map .CT {
+  fill: orange;
+  stroke: gray;
+}
+/* line 45, ../../app/styles/simple.scss */
+#map .IS, #map .BT, #map .SV, #map .BC, #map .VN,
+#map .GL, #map .NT, #map .VS {
+  fill: red;
+}
