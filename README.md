@@ -1,8 +1,10 @@
+# This project is unmaintained and uses outdated technology.
+
 ## Overview
 
 This project aims to provide an easy way to render a map of Romania and colorize it by county according to data. You can create a [choropleth map](http://en.wikipedia.org/wiki/Choropleth_map) of Romania just by referencing a csv or tsv data file and declaring a configuration object. Each county has its own element in the DOM and can be manipulated and styled via plain CSS and JavaScript.
 
-#### See a live demo [here](http://improve.ro/sandbox/romania/) - population difference across counties.
+#### See a live demo [here](https://cimi.io/romania-choropleth/) - population difference across counties.
 
 You are not forced to have a dataset to build a map. Each county has a css class with its abbreviation ('B' for Bucharest, 'BV' for Brașov etc.). You can colorize the map and add any type of events to the counties without having a dataset available. See [this simple example](http://improve.ro/sandbox/romania/simple.html) that shows the Romanian provinces colored only through CSS. The unminified code for both demos is present in this repository.
 
